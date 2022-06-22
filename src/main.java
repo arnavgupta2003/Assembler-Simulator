@@ -6,9 +6,10 @@ public class main {
 		// TODO Main I/O file
 		Scanner sc = new Scanner(System.in);
 		String line = sc.nextLine().strip();
-		String[] in = line.split(" ");
-		System.out.println(in[0]);
+		String[] in = line.split("\\s+");
+		for(String h:in) {
+			System.out.print(h+'_');
+		}
 
 	}
-
 }
