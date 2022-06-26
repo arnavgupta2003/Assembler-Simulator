@@ -1,7 +1,6 @@
 public class Switchcases{
-
-
-    public static String converttobin(String[] code){
+	
+    public static String returnOPCode(String[] code){
         switch (code[0]){
             case "add":
                 return "10000";
@@ -49,10 +48,5 @@ public class Switchcases{
 
             }
             return "Error";
-    }
-    
-    public static void main(String [] args) {
-        
-    
     }
 }
