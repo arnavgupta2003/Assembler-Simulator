@@ -9,12 +9,17 @@ public class main {
 		
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
-		String line = sc.nextLine().strip();
-		String[] in = line.split("\\s+");
-//		for(String h:in) {
-//			System.out.print(h+'_');//Debug Code
-//		}
-		
+		int cnt=0;
+		while(sc.hasNextLine()) {
+			String line = sc.nextLine().strip();
+			String[] in = line.split("\\s+");
+			cnt++;
+			boolean isLabel=false;
+			if(in[0].charAt(in[0].length()-1)==':') {
+				isLabel=true;
+			}
+			
+		}		
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
