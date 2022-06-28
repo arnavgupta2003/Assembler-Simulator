@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class main {
@@ -10,14 +12,29 @@ public class main {
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
+        HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
 			String[] in = line.split("\\s+");
+            int len=in.length;
+            String output="";
 			cnt++;
 			boolean isLabel=false;
 			if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
 			}
+            if (isLabel){
+                Labelmapping.put(in[0], cnt);
+                //String opcode=returnOP(in.slice(1,len));
+                //
+                //output+=
+            }
+            else{
+                cnt+=0;//garbage
+
+                
+
+            }
 			
 		}		
 //		//File I/O Code
@@ -30,6 +47,19 @@ public class main {
 		
 
 	}
+
+    public static String returnType(String opcode){
+        String [] Atype={"10000","10001","10110","11010","11011","11100"};
+        String [] Btype={"10010","11001"};
+        String [] Ctype ={"10011","10111","11101","11110"};
+        String [] Dtype={"10100","10101"};
+        String [] Etype={"11111","01100","01101","01111"};
+        String [] Ftype ={"01010"};
+        if(Arrays.asList(Atype).contains(opcode)){
+            return "A";
+        }
+    }
+
 	public static String returnOP(String[] code){
         switch (code[0]){
             case "add":
