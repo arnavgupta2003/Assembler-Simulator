@@ -30,7 +30,7 @@ public class main {
             }
             else{
                 cnt+=0;//garbage
-                
+
                 
 
             }
@@ -54,9 +54,9 @@ public class main {
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
         String [] Ftype ={"01010"};
-        if(Arrays.asList(Atype).contains(opcode)){
+        //if(Arrays.asList(Atype).contains(opcode)){
             return "A";
-        }
+        //}
     }
 
 	public static String returnOP(String[] code){
