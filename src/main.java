@@ -12,10 +12,11 @@ public class main {
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
+        String[] in;
         HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
-			String[] in = line.split("\\s+");
+			in = line.split("\\s+");
             int len=in.length;
             String output="";
 			cnt++;
@@ -35,8 +36,12 @@ public class main {
                 
 
             }
+            if(in[0]!="hlt"){
+                System.output("Error: no hlt statement found");
+            }
 			
-		}		
+		}
+
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
@@ -107,7 +112,7 @@ public class main {
                 }     
 
             }
-            return "Error";
+            return "Error: give eligible instruction";
     }
 	
 	 public static String returnReg(String regs){
@@ -129,8 +134,29 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "Error";
+	        return "Error: give eligible Register";
 	    }
+    public static String varCheck(String code[0]){
+        if(code[0]!="var"){
+            return "Error: give variable";
+        }
+        else if(code[0].length==16){
+            return "Error: give 16 bits var value";
+        }
+        
+    }
+    public static String hltCheck(String last_ke_3_check){
+        if(last_ke_3_check=="hlt"){
+            return ;
+        }else{
+            return "Error: give hlt";
+        }
+    } 
+    public static String error(String code[0]){
+        switch (code[0]){
+            case : 
+        }
+    }
 }
 
 
