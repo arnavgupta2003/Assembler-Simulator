@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -11,61 +12,142 @@ public class main {
 		
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
-		int cnt=0;
-        HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
-		while(sc.hasNextLine()) {
+		
+		
+		int line_counter=0;
+        boolean ishlt=false;
+		boolean isBeingGivenVar = false;
+		boolean varGiven=false;
+		
+		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
+        ArrayList<String> instructions = new ArrayList<String>();
+        HashMap<String,Integer> variables = new HashMap<String,Integer>();
+        ArrayList<String> finalBinary = new ArrayList<String>();
+        
+        //Input Handle
+		while(sc.hasNextLine()) {//Taking input
 			String line = sc.nextLine().strip();
-			String[] in = line.split("\\s+");
-            String[] in2;
-            int len=in.length;
-            String output="";
-			cnt++;
-			boolean isLabel=false;
-			if(in[0].charAt(in[0].length()-1)==':') {
+			String[] in = line.split("\\s+");//change for error gens
+			
+			//Var def for checking input
+			boolean isLabel=false;boolean isVar = false;boolean isInstruct = false;
+			
+			//Checking for Type of input
+			if(line.isBlank()||line.isEmpty()) {
+				continue;
+			}else if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
+				if(isBeingGivenVar && !varGiven) {
+					varGiven=true;
+				}else if(isBeingGivenVar) {
+					//Raise var error
+				}
+			}else if(in[0]=="var") {
+				isVar=true;
+				if(!isBeingGivenVar) {
+					isBeingGivenVar=true;
+				}
+			}else if(in[0]=="hlt") {
+				ishlt=true;
+				if(isBeingGivenVar && !varGiven) {
+					varGiven=true;
+				}else if(isBeingGivenVar) {
+					//Raise var error
+				}
+			}else {
+				isInstruct = true;
+				if(isBeingGivenVar && !varGiven) {
+					varGiven=true;
+				}else if(isBeingGivenVar) {
+					//Raise var error
+				}
 			}
-            if (isLabel){
-                Labelmapping.put(in[0], cnt);
-                for(int i=1;i<len;i++){
-                    in2=in[i];
-                }
-            }
-			else{
-                in2=in;
-            }
-            String opcode=returnOP(in2);
-            String type=returnType(opcode);
-            if (type=="A"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
-                String reg3=returnReg(in2[4]);
-                output=opcode+"00"+reg1+reg2+reg3;
-            }
-            else if(type=="B"){
-                String reg1=returnReg(in2[2]);
-                String Imm;//handle binary
-                output=opcode+reg1+Imm;
+			
+			//Commit to lists
+			if(isVar) {
+				variables.put(in[0], line_counter);
+			}else if(isLabel) {
+				Labels.put(in[0], line_counter);
+			}else if(isInstruct) {
+				instructions.add(genLine(in));
+			}
+			
+			
+			
+			line_counter++;
+		}	
+		
+		
+		//Ans Computation Handle
+		for(int cnt=0;cnt<instructions.size();cnt++) {
+			String line = instructions.get(cnt);
+			String in[] = line.split(" ");
+			
+			
+			//Getters
+			String OPCode = returnOP(in);
+			String instructionType = returnType(OPCode);
+			
+			//#Check for bit errors 
+			
+			//Setters
+			if (instructionType=="A"){
+				//Registers Load
+                String reg1=returnReg(in[1]);
+                String reg2=returnReg(in[2]);
+                String reg3=returnReg(in[3]);
                 
+                //Function Out
+                finalBinary.add(OPCode+"00"+reg1+reg2+reg3);
             }
-            else if(type=="C"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
-                output=opcode+"00000"+reg1+reg2;
+            else if(instructionType=="B"){
+            	//Registers Load
+                String reg1=returnReg(in[1]);
+                
+                //	Imm Handle
+                String Imm; 
+                String Imm_val_String = in[2].substring(1, in[0].length()-1);//Took decimal Input
+                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
+                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
+                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
+                
+                //Function Out
+                finalBinary.add(OPCode+reg1+Imm);
+                
+            }//Contd.
+            else if(instructionType=="C"){
+            	//Registers Load
+                String reg1=returnReg(in[1]);
+                String reg2=returnReg(in[2]);
+                
+                //Function Out
+                finalBinary.add(OPCode+"00000"+reg1+reg2);
             }
-            else if(type=="D"){
-                String reg1=returnReg(in[2]);
+            else if(instructionType=="D"){
+            	//Registers Load
+                String reg1=returnReg(in[1]);
                 String Memadd;//handle variable
-                output=opcode+reg1+Memadd;
+                
+              //Function Out
+                //finalBinary=OPCode+reg1+Memadd;
             }
-            else if(type=="E"){
-                String Memadd;//handle label
-                output=opcode+"000"+Memadd;
-            }            
-            else if(type=="F"){
-                output=opcode+"00000"+"00000"+"0";
-            }
+            else if(instructionType=="E"){
+                //int Mem=Labelmapping.get(in[1]);
 
-		}		
+                String Memadd;//handle binary
+                
+              //Function Out
+               // finalBinary=OPCode+"000"+Memadd;
+            }            
+            else if(instructionType=="F"){
+            	
+            	//Function Out
+                finalBinary.add(OPCode+"00000"+"00000"+"0");
+            }
+			
+		}
+		
+		
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
@@ -76,39 +158,46 @@ public class main {
 		
 
 	}
+	public static String genLine(String[] arr) {
+		String ans="";
+		for(String h:arr) {
+			ans+=(h+" ");
+		}
+		return ans.strip();
+	}
 
-    public static String returnType(String opcode){
+    public static String returnType(String OPCode){
         String [] Atype={"10000","10001","10110","11010","11011","11100"};
         String [] Btype={"10010","11001"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
         String [] Ftype ={"01010"};
-        if(Arrays.asList(Atype).contains(opcode)){
+        if(Arrays.asList(Atype).contains(OPCode)){
             return "A";
         }
-        else if(Arrays.asList(Btype).contains(opcode)){
+        else if(Arrays.asList(Btype).contains(OPCode)){
             return "B";
         }
-        else if(Arrays.asList(Ctype).contains(opcode)){
+        else if(Arrays.asList(Ctype).contains(OPCode)){
             return "C";
         }
-        else if(Arrays.asList(Dtype).contains(opcode)){
+        else if(Arrays.asList(Dtype).contains(OPCode)){
             return "C";
         }
-        else if(Arrays.asList(Etype).contains(opcode)){
+        else if(Arrays.asList(Etype).contains(OPCode)){
             return "E";
         }
-        else if(Arrays.asList(Ftype).contains(opcode)){
+        else if(Arrays.asList(Ftype).contains(OPCode)){
             return "F";
         }
         else{
-            return "Error";
+            return "Error in OPCode - Type";
         }
     }
 
-	public static String returnOP(String[] code){
-        switch (code[0]){
+	public static String returnOP(String[] instruction){
+        switch (instruction[0]){
             case "add":
                 return "10000";
             case "sub":
@@ -146,7 +235,7 @@ public class main {
             case "hlt":
                 return "01010";
             case "mov":
-                switch (code[2].charAt(0)){
+                switch (instruction[2].charAt(0)){
                     case '#':
                         return "10010";       
                     case 'r':
@@ -154,11 +243,11 @@ public class main {
                 }     
 
             }
-            return "Error";
+            return "Error in OPCode";
     }
 	
-	 public static String returnReg(String regs){
-	        switch (regs){
+	 public static String returnReg(String register){
+	        switch (register){
 	            case "R0":
 	                return "000";
 	            case "R1":
@@ -176,7 +265,7 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "Error";
+	        return "Error in Reg";
 	    }
 }
 
