@@ -29,8 +29,7 @@ public class main {
                 for(int i=1;i<len;i++){
                     in2=in[i];
                 }
-            }
-			else{
+            }else{
                 in2=in;
             }
             String opcode=returnOP(in2);
