@@ -218,9 +218,9 @@ public static bool checkFlag(String regs){
 
 
 
-public static void errorgen(String Type,int pc){
+public static void errorgen(String Type,int pogc){
     List error_list = new ArrayList();
-    pc.String pc=String.valueOf(pc);
+    pc.String pc=String.valueOf(pogc);
     if (Type=="typo"){
         String error_line="Error: Typo in line "+ pc;
         error_list.add(error_line);
