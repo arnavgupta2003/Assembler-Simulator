@@ -12,11 +12,11 @@ public class main {
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
-        String[] in;
         HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
-			in = line.split("\\s+");
+			String[] in = line.split("\\s+");
+            String[] in2;
             int len=in.length;
             String output="";
 			cnt++;
@@ -26,22 +26,52 @@ public class main {
 			}
             if (isLabel){
                 Labelmapping.put(in[0], cnt);
-                //String opcode=returnOP(in.slice(1,len));
-                //
-                //output+=
+                for(int i=1;i<len;i++){
+                    in2=in[i];
+                }
             }
-            else{
-                cnt+=0;//garbage
-
-                
-
+			else{
+                in2=in;
             }
+            String opcode=returnOP(in2);
+            String type=returnType(opcode);
+            if (type=="A"){
+                String reg1=returnReg(in2[2]);
+                String reg2=returnReg(in2[3]);
+                String reg3=returnReg(in2[4]);
+                output=opcode+"00"+reg1+reg2+reg3;
+            }
+            else if(type=="B"){
+                String reg1=returnReg(in2[2]);
+                // checking if Imm is in the defined range
+                String Imm;//handle binary
+
+                output=opcode+reg1+Imm;
+                 
+            }/* 
             if(in[0]!="hlt"){
                 System.output("Error: no hlt statement found");
-            }
-			
-		}
+            }*/
 
+            else if(type=="C"){
+                String reg1=returnReg(in2[2]);
+                String reg2=returnReg(in2[3]);
+                output=opcode+"00000"+reg1+reg2;
+            }
+            else if(type=="D"){
+                String reg1=returnReg(in[2]);
+                String Memadd;//handle variable
+                output=opcode+reg1+Memadd;
+            }
+            else if(type=="E"){
+                String Memadd;//handle label
+                output=opcode+"000"+Memadd;
+            }            
+            else if(type=="F"){
+                output=opcode+"00000"+"00000"+"0";
+            }
+
+		}		
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
@@ -62,6 +92,24 @@ public class main {
         String [] Ftype ={"01010"};
         if(Arrays.asList(Atype).contains(opcode)){
             return "A";
+        }
+        else if(Arrays.asList(Btype).contains(opcode)){
+            return "B";
+        }
+        else if(Arrays.asList(Ctype).contains(opcode)){
+            return "C";
+        }
+        else if(Arrays.asList(Dtype).contains(opcode)){
+            return "C";
+        }
+        else if(Arrays.asList(Etype).contains(opcode)){
+            return "E";
+        }
+        else if(Arrays.asList(Ftype).contains(opcode)){
+            return "F";
+        }
+        else{
+            return "Error";
         }
     }
 
@@ -145,13 +193,13 @@ public class main {
         }
         
     }
-    public static String hltCheck(String last_ke_3_check){
-        if(last_ke_3_check=="hlt"){
-            return ;
-        }else{
-            return "Error: give hlt";
-        }
-    } 
+    // public static String hltCheck(String last_ke_3_check){
+    //     if(last_ke_3_check=="hlt"){
+    //         return ;
+    //     }else{
+    //         return "Error: give hlt";
+    //     }
+    // } 
     public static String error(String code[0]){
         switch (code[0]){
             case : 
@@ -159,4 +207,45 @@ public class main {
     }
 }
 
+public static bool checkFlag(String regs){
+    if (regs=="111"){
+        return true;
+    }
+    return false;
+}
 
+
+
+
+
+public static void errorgen(String Type,int pc){
+    if (Type=="typo"){
+        println("Typo in line $pc");
+    }
+    else if(Type=="undefined_var"){
+        println("Used undefined variable in line $pc");
+    }else if(Type=="undefined_label"){
+        println("Error: Used undefined label in line $pc");
+    }
+    else if(Type=="illegal_flag"){
+        println("Error: illegal flag usage in line $pc");
+    }
+    else if(Type=="immediateVal"){
+        println("Error: Immediate value out of given range in line $pc");
+    }
+    else if(Type=="label_as_var"){
+        println("Error: Used label as flag in line $pc");
+    }
+    else if(Type=="var_as_label"){
+        println("Error: Used var as label in line $pc");
+    }
+    else if(Type=="var_declared_between"){
+        println("Error: Variable not declared at the beginning in line $pc");
+    }
+    else if(Type=="hlt_missing"){
+        println("Error: hlt statement missing in line $pc");
+    }
+    else if(Type=="hlt_not_at_end"){
+        println("Error: hlt not used at the end in line $pc");
+    }
+}
