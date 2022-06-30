@@ -13,6 +13,7 @@ public class main {
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
         HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
+
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
 			String[] in = line.split("\\s+");
@@ -26,8 +27,10 @@ public class main {
 			}
             if (isLabel){
                 Labelmapping.put(in[0], cnt);
+                int j=0;
                 for(int i=1;i<len;i++){
-                    in2=in[i];
+                    in2[j]=in[i];
+                    j++;
                 }
             }else{
                 in2=in;
@@ -35,29 +38,32 @@ public class main {
             String opcode=returnOP(in2);
             String type=returnType(opcode);
             if (type=="A"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
-                String reg3=returnReg(in2[4]);
+                String reg1=returnReg(in2[1]);
+                String reg2=returnReg(in2[2]);
+                String reg3=returnReg(in2[3]);
                 output=opcode+"00"+reg1+reg2+reg3;
             }
             else if(type=="B"){
-                String reg1=returnReg(in2[2]);
+                String reg1=returnReg(in2[1]);
+                
                 String Imm;//handle binary
                 output=opcode+reg1+Imm;
                 
             }
             else if(type=="C"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
+                String reg1=returnReg(in2[1]);
+                String reg2=returnReg(in2[2]);
                 output=opcode+"00000"+reg1+reg2;
             }
             else if(type=="D"){
-                String reg1=returnReg(in[2]);
+                String reg1=returnReg(in[1]);
                 String Memadd;//handle variable
                 output=opcode+reg1+Memadd;
             }
             else if(type=="E"){
-                String Memadd;//handle label
+                int Mem=Labelmapping.get(in2[1]);
+
+                String Memadd;//handle binary
                 output=opcode+"000"+Memadd;
             }            
             else if(type=="F"){
