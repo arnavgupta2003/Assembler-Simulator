@@ -1,7 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class main {
@@ -13,58 +15,120 @@ public class main {
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
         HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
+        HashMap <String,Integer> Variablemapping = new HashMap <String,Integer>();
+        int no_lines=0;
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
-			String[] in = line.split("\\s+");
-            String[] in2;
+			String[] in = line.split("\\s+");//change for error gens
+            String[] in2 = new String[in.length];
             int len=in.length;
             String output="";
 			cnt++;
 			boolean isLabel=false;
+            if (in[0]=="var"){
+                errorgen("Var_used",cnt);
+            }
 			if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
 			}
             if (isLabel){
                 Labelmapping.put(in[0], cnt);
-                for(int i=1;i<len;i++){
-                    in2=in[i];
+                int j=0;
+                for(int i=1;i<in.length;i++){
+                    in2[j]=in[i];
+                    j++;
+                }
+            }else{
+            	int j=0;
+            	for(int i=0;i<in.length;i++){
+                    in2[j]=in[i];
+                    j++;
                 }
             }
-			else{
-                in2=in;
-            }
-            String opcode=returnOP(in2);
+            String opcode=returnOP(in2,cnt);
             String type=returnType(opcode);
             if (type=="A"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
-                String reg3=returnReg(in2[4]);
+                String reg1=returnReg(in2[1],cnt);
+                String reg2=returnReg(in2[2],cnt);
+                String reg3=returnReg(in2[3],cnt);
+                if(checkFlag(reg1) || checkFlag(reg2) || checkFlag(reg3)){
+                    errorgen("illegal_flag",cnt);
+                }
                 output=opcode+"00"+reg1+reg2+reg3;
             }
             else if(type=="B"){
-                String reg1=returnReg(in2[2]);
-                // checking if Imm is in the defined range
-                String Imm;//handle binary
+                String reg1=returnReg(in2[1],cnt);
+                if(checkFlag(reg1)){
+                    errorgen("illegal_flag",cnt);
+                }
 
+                String Imm; 
+                String Imm_val = in2[2].substring(1, in2[0].length()-1);//handle binary
+                int temp = Integer.parseInt(Imm_val);
+                if(temp>255&&temp<0){
+                    errorgen("immediateVal",cnt);
+                }
+                String bin = Integer.toBinaryString(temp);//convert to bin;//convert to 8 bit
+                Imm=String.format("%08d", Integer.parseInt(bin));
                 output=opcode+reg1+Imm;
                  
-            }/* 
-            if(in[0]!="hlt"){
-                System.output("Error: no hlt statement found");
-            }*/
+            }
 
             else if(type=="C"){
-                String reg1=returnReg(in2[2]);
-                String reg2=returnReg(in2[3]);
+                String reg1=returnReg(in2[1],cnt);
+                String reg2=returnReg(in2[2],cnt);
+                if(opcode=="10011"){
+                    if(checkFlag(reg2)){
+                        errorgen("illegal_flag",cnt);
+                    }
+                }
+                else{
+                    if(checkFlag(reg1) || checkFlag(reg2)){
+                        errorgen("illegal_flag",cnt);
+                    }
+                }
                 output=opcode+"00000"+reg1+reg2;
             }
             else if(type=="D"){
-                String reg1=returnReg(in[2]);
-                String Memadd;//handle variable
+                String reg1=returnReg(in[1],cnt);
+                if(checkFlag(reg1)){
+                    errorgen("illegal_flag",cnt);
+                }
+
+                String Memadd;
+                if ((Variablemapping.keySet().contains(in[2]))){
+                    int variable_val=Variablemapping.get(in[2]);
+                    String bin = Integer.toBinaryString(variable_val);
+                    Memadd=String.format("%08d", Integer.parseInt(bin));
+
+                }
+                else{
+                    if((Labelmapping.keySet().contains(in[2]))){
+                        errorgen("label_as_var", cnt);
+                    }
+                    else{
+                        errorgen("undefined_var", cnt);
+                    }
+                }
                 output=opcode+reg1+Memadd;
             }
             else if(type=="E"){
-                String Memadd;//handle label
+                String Memadd;
+                if ((Labelmapping.keySet().contains(in[2]))){
+                    int label_val=Labelmapping.get(in[2]);
+                    String bin = Integer.toBinaryString(label_val);
+                    Memadd=String.format("%08d", Integer.parseInt(bin));
+
+                }
+                else{
+                    if((Variablemapping.keySet().contains(in[2]))){
+                        errorgen("var_as_label", cnt);
+                    }
+                    else{
+                        errorgen("undefined_label", cnt);
+                    }
+                }
+
                 output=opcode+"000"+Memadd;
             }            
             else if(type=="F"){
@@ -109,11 +173,11 @@ public class main {
             return "F";
         }
         else{
-            return "Error";
+            return "_";
         }
     }
 
-	public static String returnOP(String[] code){
+	public static String returnOP(String[] code,int cmt){
         switch (code[0]){
             case "add":
                 return "10000";
@@ -160,10 +224,11 @@ public class main {
                 }     
 
             }
-            return "Error: give eligible instruction";
+            return "_";
+            errorgen("Typo", cmt);
     }
 	
-	 public static String returnReg(String regs){
+	 public static String returnReg(String regs,int cmt){
 	        switch (regs){
 	            case "R0":
 	                return "000";
@@ -184,25 +249,64 @@ public class main {
 	        }
 	        return "Error: give eligible Register";
 	    }
-    public static String varCheck(String code[0]){
-        if(code[0]!="var"){
-            return "Error: give variable";
+
+        public static boolean checkFlag(String regs){
+            if (regs=="111"){
+                return true;
+            }
+            return false;
         }
-        else if(code[0].length==16){
-            return "Error: give 16 bits var value";
+    public static void errorgen(String Type,int pogc){
+        List error_list = new ArrayList();
+        String pc=String.valueOf(pogc);
+        if (Type=="Typo"){
+            String error_line="Error: Typo in line "+ pc;
+            error_list.add(error_line);
+            // println("Typo in line $pc");
         }
-        
-    }
-    // public static String hltCheck(String last_ke_3_check){
-    //     if(last_ke_3_check=="hlt"){
-    //         return ;
-    //     }else{
-    //         return "Error: give hlt";
-    //     }
-    // } 
-    public static String error(String code[0]){
-        switch (code[0]){
-            case : 
+        else if(Type=="undefined_var"){
+            String error_line="Error: Used undefined variable in line "+ pc;
+            error_list.add(error_line);
+            // println("Used undefined variable in line $pc");
+        }else if(Type=="undefined_label"){
+            String error_line="Error: Typo in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used undefined label in line $pc");
+        }
+        else if(Type=="illegal_flag"){
+            String error_line="Error: illegal flag usage in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: illegal flag usage in line $pc");
+        }
+        else if(Type=="immediateVal"){
+            String error_line="Error: Immediate value out of given range in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Immediate value out of given range in line $pc");
+        }
+        else if(Type=="label_as_var"){
+            String error_line="Error: Used label as flag in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used label as flag in line $pc");
+        }
+        else if(Type=="var_as_label"){
+            String error_line="Error: Used var as label in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used var as label in line $pc");
+        }
+        else if(Type=="var_declared_between"){
+            String error_line="Error: Variable not declared at the beginning in line  "+ pc;
+            error_list.add(error_line);
+            // println("Error: Variable not declared at the beginning in line $pc");
+        }
+        else if(Type=="hlt_missing"){
+            String error_line="Error: hlt statement missing in line $pc "+ pc;
+            error_list.add(error_line);
+            // println("Error: hlt statement missing in line $pc");
+        }
+        else if(Type=="hlt_not_at_end"){
+            String error_line="Error: hlt not used at the end in line $pc "+ pc;
+            error_list.add(error_line);
+            // println("Error: hlt not used at the end in line $pc");
         }
     }
 }
