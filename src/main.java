@@ -1,7 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class main {
@@ -49,6 +51,9 @@ public class main {
                 String reg1=returnReg(in2[1],cnt);
                 String reg2=returnReg(in2[2],cnt);
                 String reg3=returnReg(in2[3],cnt);
+                if(checkFlag(reg1) || checkFlag(reg2) || checkFlag(reg3)){
+                    
+                }
                 output=opcode+"00"+reg1+reg2+reg3;
             }
             else if(type=="B"){
@@ -69,8 +74,12 @@ public class main {
             }
             else if(type=="D"){
                 String reg1=returnReg(in[1],cnt);
+                String Memadd;
                 if ((Variablemapping.keySet().contains(in[2]))){
-                    int variableval=Variablemapping.get(in[2]);
+                    int variable_val=Variablemapping.get(in[2]);
+                    String bin = Integer.toBinaryString(variable_val);
+                    Memadd=String.format("%08d", Integer.parseInt(bin));
+
                 }
                 else{
                     if((Labelmapping.keySet().contains(in[2]))){
@@ -80,14 +89,26 @@ public class main {
                         errorgen("undefined_var", cnt);
                     }
                 }
-                String Memadd;//handle variable
-                //output=opcode+reg1+Memadd;
+                output=opcode+reg1+Memadd;
             }
             else if(type=="E"){
-                int Mem=Labelmapping.get(in2[1]);
+                String Memadd;
+                if ((Labelmapping.keySet().contains(in[2]))){
+                    int label_val=Labelmapping.get(in[2]);
+                    String bin = Integer.toBinaryString(label_val);
+                    Memadd=String.format("%08d", Integer.parseInt(bin));
 
-                String Memadd;//handle binary
-               // output=opcode+"000"+Memadd;
+                }
+                else{
+                    if((Variablemapping.keySet().contains(in[2]))){
+                        errorgen("var_as_label", cnt);
+                    }
+                    else{
+                        errorgen("undefined_label", cnt);
+                    }
+                }
+
+                output=opcode+"000"+Memadd;
             }            
             else if(type=="F"){
                 output=opcode+"00000"+"00000"+"0";
@@ -214,9 +235,58 @@ public class main {
             }
             return false;
         }
-        public static void errorgen(String Type,int pc){
-           
+    public static void errorgen(String Type,int pogc){
+        List error_list = new ArrayList();
+        String pc=String.valueOf(pogc);
+        if (Type=="Typo"){
+            String error_line="Error: Typo in line "+ pc;
+            error_list.add(error_line);
+            // println("Typo in line $pc");
         }
+        else if(Type=="undefined_var"){
+            String error_line="Error: Used undefined variable in line "+ pc;
+            error_list.add(error_line);
+            // println("Used undefined variable in line $pc");
+        }else if(Type=="undefined_label"){
+            String error_line="Error: Typo in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used undefined label in line $pc");
+        }
+        else if(Type=="illegal_flag"){
+            String error_line="Error: illegal flag usage in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: illegal flag usage in line $pc");
+        }
+        else if(Type=="immediateVal"){
+            String error_line="Error: Immediate value out of given range in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Immediate value out of given range in line $pc");
+        }
+        else if(Type=="label_as_var"){
+            String error_line="Error: Used label as flag in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used label as flag in line $pc");
+        }
+        else if(Type=="var_as_label"){
+            String error_line="Error: Used var as label in line "+ pc;
+            error_list.add(error_line);
+            // println("Error: Used var as label in line $pc");
+        }
+        else if(Type=="var_declared_between"){
+            String error_line="Error: Variable not declared at the beginning in line  "+ pc;
+            error_list.add(error_line);
+            // println("Error: Variable not declared at the beginning in line $pc");
+        }
+        else if(Type=="hlt_missing"){
+            String error_line="Error: hlt statement missing in line $pc "+ pc;
+            error_list.add(error_line);
+            // println("Error: hlt statement missing in line $pc");
+        }
+        else if(Type=="hlt_not_at_end"){
+            String error_line="Error: hlt not used at the end in line $pc "+ pc;
+            error_list.add(error_line);
+            // println("Error: hlt not used at the end in line $pc");
+        }
+    }
 }
-
 
