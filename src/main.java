@@ -132,7 +132,11 @@ public class main {
                 output=opcode+"000"+Memadd;
             }            
             else if(type=="F"){
+                if(cnt!=no_lines){
+                    errorgen("hlt_not_at_end", cnt);
+                }
                 output=opcode+"00000"+"00000"+"0";
+
             }
 
 		}		
@@ -256,7 +260,7 @@ public class main {
             }
             return false;
         }
-    public static void errorgen(String Type,int pogc){
+        public static void errorgen(String Type,int pogc){
         List error_list = new ArrayList();
         String pc=String.valueOf(pogc);
         if (Type=="Typo"){
@@ -310,70 +314,4 @@ public class main {
         }
     }
 }
-
-public static bool checkFlag(String regs){
-    if (regs=="111"){
-        return true;
-    }
-    return false;
-}
-
-
-
-
-
-public static void errorgen(String Type,int pogc){
-    List error_list = new ArrayList();
-    pc.String pc=String.valueOf(pogc);
-    if (Type=="typo"){
-        String error_line="Error: Typo in line "+ pc;
-        error_list.add(error_line);
-        // println("Typo in line $pc");
-    }
-    else if(Type=="undefined_var"){
-        String error_line="Error: Used undefined variable in line "+ pc;
-        error_list.add(error_line);
-        // println("Used undefined variable in line $pc");
-    }else if(Type=="undefined_label"){
-        String error_line="Error: Typo in line "+ pc;
-        error_list.add(error_line);
-        // println("Error: Used undefined label in line $pc");
-    }
-    else if(Type=="illegal_flag"){
-        String error_line="Error: illegal flag usage in line "+ pc;
-        error_list.add(error_line);
-        // println("Error: illegal flag usage in line $pc");
-    }
-    else if(Type=="immediateVal"){
-        String error_line="Error: Immediate value out of given range in line "+ pc;
-        error_list.add(error_line);
-        // println("Error: Immediate value out of given range in line $pc");
-    }
-    else if(Type=="label_as_var"){
-        String error_line="Error: Used label as flag in line "+ pc;
-        error_list.add(error_line)
-        // println("Error: Used label as flag in line $pc");
-    }
-    else if(Type=="var_as_label"){
-        String error_line="Error: Used var as label in line "+ pc;
-        error_list.add(error_line);
-        // println("Error: Used var as label in line $pc");
-    }
-    else if(Type=="var_declared_between"){
-        String error_line="Error: Variable not declared at the beginning in line  "+ pc;
-        error_list.add(error_line);
-        // println("Error: Variable not declared at the beginning in line $pc");
-    }
-    else if(Type=="hlt_missing"){
-        String error_line="Error: hlt statement missing in line $pc "+ pc;
-        error_list.add(error_line);
-        // println("Error: hlt statement missing in line $pc");
-    }
-    else if(Type=="hlt_not_at_end"){
-        String error_line="Error: hlt not used at the end in line $pc "+ pc;
-        error_list.add(error_line);
-        // println("Error: hlt not used at the end in line $pc");
-    }
-}
-
 
