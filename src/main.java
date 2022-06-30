@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class main {
-
+	//ArrayList for STDOut
+	public static ArrayList<String> error_list = new ArrayList<String>();
+    public static ArrayList<String> finalBinary = new ArrayList<String>();
+	
 	public static void main(String[] args) throws FileNotFoundException{
 		// TODO Main I/O file
 		
@@ -19,10 +22,11 @@ public class main {
 		boolean isBeingGivenVar = false;
 		boolean varGiven=false;
 		
+		
 		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
         ArrayList<String> instructions = new ArrayList<String>();
         HashMap<String,Integer> variables = new HashMap<String,Integer>();
-        ArrayList<String> finalBinary = new ArrayList<String>();
+
         
         //Input Handle
 		while(sc.hasNextLine()) {//Taking input
@@ -158,6 +162,60 @@ public class main {
 		
 
 	}
+	
+	public static void genError(String Type,int programCounter){
+	    
+	    if (Type=="typo"){
+	        String error_line="Error: Typo in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Typo in line $pc");
+	    }
+	    else if(Type=="undefined_var"){
+	        String error_line="Error: Used undefined variable in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Used undefined variable in line $pc");
+	    }else if(Type=="undefined_label"){
+	        String error_line="Error: Typo in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: Used undefined label in line $pc");
+	    }
+	    else if(Type=="illegal_flag"){
+	        String error_line="Error: illegal flag usage in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: illegal flag usage in line $pc");
+	    }
+	    else if(Type=="immediateVal"){
+	        String error_line="Error: Immediate value out of given range in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: Immediate value out of given range in line $pc");
+	    }
+	    else if(Type=="label_as_var"){
+	        String error_line="Error: Used label as flag in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: Used label as flag in line $pc");
+	    }
+	    else if(Type=="var_as_label"){
+	        String error_line="Error: Used var as label in line "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: Used var as label in line $pc");
+	    }
+	    else if(Type=="var_declared_between"){
+	        String error_line="Error: Variable not declared at the beginning in line  "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: Variable not declared at the beginning in line $pc");
+	    }
+	    else if(Type=="hlt_missing"){
+	        String error_line="Error: hlt statement missing in line $pc "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: hlt statement missing in line $pc");
+	    }
+	    else if(Type=="hlt_not_at_end"){
+	        String error_line="Error: hlt not used at the end in line $pc "+ String.valueOf(programCounter);
+	        error_list.add(error_line);
+	        // println("Error: hlt not used at the end in line $pc");
+	    }
+	}    
+	    
 	public static String genLine(String[] arr) {
 		String ans="";
 		for(String h:arr) {
