@@ -59,8 +59,9 @@ public class main {
                 String bin = Integer.toBinaryString(temp);//convert to bin;//convert to 8 bit
                 Imm=String.format("%08d", Integer.parseInt(bin));
                 output=opcode+reg1+Imm;
-                
+                 
             }
+
             else if(type=="C"){
                 String reg1=returnReg(in2[1],cnt);
                 String reg2=returnReg(in2[2],cnt);
@@ -68,7 +69,17 @@ public class main {
             }
             else if(type=="D"){
                 String reg1=returnReg(in[1],cnt);
-                //if (in[2])
+                if ((Variablemapping.keySet().contains(in[2]))){
+                    int variableval=Variablemapping.get(in[2]);
+                }
+                else{
+                    if((Labelmapping.keySet().contains(in[2]))){
+                        errorgen("label_as_var", cnt);
+                    }
+                    else{
+                        errorgen("undefined_var", cnt);
+                    }
+                }
                 String Memadd;//handle variable
                 //output=opcode+reg1+Memadd;
             }
@@ -194,11 +205,17 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "_";
-            errorgen("Typo", cmt);
+	        return "Error: give eligible Register";
 	    }
-    public static void errorgen(String Type,int pc){
-            
+
+        public static boolean checkFlag(String regs){
+            if (regs=="111"){
+                return true;
+            }
+            return false;
+        }
+        public static void errorgen(String Type,int pc){
+           
         }
 }
 
