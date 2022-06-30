@@ -13,7 +13,8 @@ public class main {
 		Scanner sc = new Scanner(System.in);
 		int cnt=0;
         HashMap <String,Integer> Labelmapping = new HashMap <String,Integer>();
-
+        HashMap <String,Integer> Variablemapping = new HashMap <String,Integer>();
+        int no_lines=0;
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
 			String[] in = line.split("\\s+");//change for error gens
@@ -22,6 +23,9 @@ public class main {
             String output="";
 			cnt++;
 			boolean isLabel=false;
+            if (in[0]=="var"){
+                errorgen("Var_used",cnt);
+            }
 			if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
 			}
@@ -39,16 +43,16 @@ public class main {
                     j++;
                 }
             }
-            String opcode=returnOP(in2);
+            String opcode=returnOP(in2,cnt);
             String type=returnType(opcode);
             if (type=="A"){
-                String reg1=returnReg(in2[1]);
-                String reg2=returnReg(in2[2]);
-                String reg3=returnReg(in2[3]);
+                String reg1=returnReg(in2[1],cnt);
+                String reg2=returnReg(in2[2],cnt);
+                String reg3=returnReg(in2[3],cnt);
                 output=opcode+"00"+reg1+reg2+reg3;
             }
             else if(type=="B"){
-                String reg1=returnReg(in2[1]);
+                String reg1=returnReg(in2[1],cnt);
                 String Imm; 
                 String Imm_val = in2[2].substring(1, in2[0].length()-1);//handle binary
                 int temp = Integer.parseInt(Imm_val);
@@ -58,12 +62,13 @@ public class main {
                 
             }
             else if(type=="C"){
-                String reg1=returnReg(in2[1]);
-                String reg2=returnReg(in2[2]);
+                String reg1=returnReg(in2[1],cnt);
+                String reg2=returnReg(in2[2],cnt);
                 output=opcode+"00000"+reg1+reg2;
             }
             else if(type=="D"){
-                String reg1=returnReg(in[1]);
+                String reg1=returnReg(in[1],cnt);
+                //if (in[2])
                 String Memadd;//handle variable
                 //output=opcode+reg1+Memadd;
             }
@@ -115,11 +120,11 @@ public class main {
             return "F";
         }
         else{
-            return "Error";
+            return "_";
         }
     }
 
-	public static String returnOP(String[] code){
+	public static String returnOP(String[] code,int cmt){
         switch (code[0]){
             case "add":
                 return "10000";
@@ -166,10 +171,11 @@ public class main {
                 }     
 
             }
-            return "Error";
+            return "_";
+            errorgen("Typo", cmt);
     }
 	
-	 public static String returnReg(String regs){
+	 public static String returnReg(String regs,int cmt){
 	        switch (regs){
 	            case "R0":
 	                return "000";
@@ -188,8 +194,12 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "Error";
+	        return "_";
+            errorgen("Typo", cmt);
 	    }
+    public static void errorgen(String Type,int pc){
+            
+        }
 }
 
 
