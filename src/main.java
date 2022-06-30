@@ -18,7 +18,6 @@ public class main {
 			String line = sc.nextLine().strip();
 			String[] in = line.split("\\s+");//change for error gens
             String[] in2 = new String[in.length];
-            int len=in.length;
             String output="";
 			cnt++;
 			boolean isLabel=false;
