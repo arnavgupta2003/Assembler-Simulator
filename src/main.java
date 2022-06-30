@@ -16,8 +16,8 @@ public class main {
 
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
-			String[] in = line.split("\\s+");
-            String[] in2;
+			String[] in = line.split("\\s+");//change for error gens
+            String[] in2 = new String[in.length-1];
             int len=in.length;
             String output="";
 			cnt++;
@@ -45,8 +45,11 @@ public class main {
             }
             else if(type=="B"){
                 String reg1=returnReg(in2[1]);
-                
-                String Imm;//handle binary
+                String Imm; 
+                String Imm_val = in2[2].substring(1, in2[0].length()-1);//handle binary
+                int temp = Integer.parseInt(Imm_val);
+                String bin = Integer.toBinaryString(temp);//convert to bin;//convert to 8 bit
+                Imm=String.format("%08d", Integer.parseInt(bin));
                 output=opcode+reg1+Imm;
                 
             }
@@ -58,13 +61,13 @@ public class main {
             else if(type=="D"){
                 String reg1=returnReg(in[1]);
                 String Memadd;//handle variable
-                output=opcode+reg1+Memadd;
+                //output=opcode+reg1+Memadd;
             }
             else if(type=="E"){
                 int Mem=Labelmapping.get(in2[1]);
 
                 String Memadd;//handle binary
-                output=opcode+"000"+Memadd;
+               // output=opcode+"000"+Memadd;
             }            
             else if(type=="F"){
                 output=opcode+"00000"+"00000"+"0";
