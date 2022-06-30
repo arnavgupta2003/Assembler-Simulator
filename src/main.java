@@ -17,7 +17,7 @@ public class main {
 		while(sc.hasNextLine()) {
 			String line = sc.nextLine().strip();
 			String[] in = line.split("\\s+");//change for error gens
-            String[] in2 = new String[in.length-1];
+            String[] in2 = new String[in.length];
             int len=in.length;
             String output="";
 			cnt++;
@@ -28,12 +28,16 @@ public class main {
             if (isLabel){
                 Labelmapping.put(in[0], cnt);
                 int j=0;
-                for(int i=1;i<len;i++){
+                for(int i=1;i<in.length;i++){
                     in2[j]=in[i];
                     j++;
                 }
             }else{
-                in2=in;
+            	int j=0;
+            	for(int i=0;i<in.length;i++){
+                    in2[j]=in[i];
+                    j++;
+                }
             }
             String opcode=returnOP(in2);
             String type=returnType(opcode);
