@@ -114,10 +114,6 @@ public class main {
             }
 			
             String in[] = line.split(" ");
-            
-			String line = instructions.get(insCount);
-			String in[] = line.split(" ");
-
 			int cnt=insCount+variables.size()+1;
 			
 			//Getters
