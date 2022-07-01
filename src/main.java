@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class main {
-	//ArrayList for STDOut
-	public static ArrayList<String> error_list = new ArrayList<String>();
-    public static ArrayList<String> finalBinary = new ArrayList<String>();
-	
+
 	public static void main(String[] args) throws FileNotFoundException{
 		// TODO Main I/O file
 		
@@ -30,37 +27,9 @@ public class main {
 			boolean isLabel=false;
             if (in[0]=="var"){
                 errorgen("Var_used",cnt);
-
-            }
-            if(cnt==no_lines&&in[0]!="hlt"){
-                errorgen("hlt_missing",cnt);
             }
 			if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					//Raise var error
-				}
-			}else if(in[0]=="var") {
-				isVar=true;
-				if(!isBeingGivenVar) {
-					isBeingGivenVar=true;
-				}
-			}else if(in[0]=="hlt") {
-				ishlt=true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					//Raise var error
-				}
-			}else {
-				isInstruct = true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					//Raise var error
-				}
 			}
             if (isLabel){
                 Labelmapping.put(in[0], cnt);
@@ -169,10 +138,8 @@ public class main {
                 output=opcode+"00000"+"00000"+"0";
 
             }
-			
-		}
-		
-		
+
+		}		
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
@@ -183,91 +150,30 @@ public class main {
 		
 
 	}
-	
-	public static void genError(String Type,int programCounter){
-	    
-	    if (Type=="typo"){
-	        String error_line="Error: Typo in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Typo in line $pc");
-	    }
-	    else if(Type=="undefined_var"){
-	        String error_line="Error: Used undefined variable in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Used undefined variable in line $pc");
-	    }else if(Type=="undefined_label"){
-	        String error_line="Error: Typo in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: Used undefined label in line $pc");
-	    }
-	    else if(Type=="illegal_flag"){
-	        String error_line="Error: illegal flag usage in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: illegal flag usage in line $pc");
-	    }
-	    else if(Type=="immediateVal"){
-	        String error_line="Error: Immediate value out of given range in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: Immediate value out of given range in line $pc");
-	    }
-	    else if(Type=="label_as_var"){
-	        String error_line="Error: Used label as flag in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: Used label as flag in line $pc");
-	    }
-	    else if(Type=="var_as_label"){
-	        String error_line="Error: Used var as label in line "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: Used var as label in line $pc");
-	    }
-	    else if(Type=="var_declared_between"){
-	        String error_line="Error: Variable not declared at the beginning in line  "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: Variable not declared at the beginning in line $pc");
-	    }
-	    else if(Type=="hlt_missing"){
-	        String error_line="Error: hlt statement missing in line $pc "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: hlt statement missing in line $pc");
-	    }
-	    else if(Type=="hlt_not_at_end"){
-	        String error_line="Error: hlt not used at the end in line $pc "+ String.valueOf(programCounter);
-	        error_list.add(error_line);
-	        // println("Error: hlt not used at the end in line $pc");
-	    }
-	}    
-	    
-	public static String genLine(String[] arr) {
-		String ans="";
-		for(String h:arr) {
-			ans+=(h+" ");
-		}
-		return ans.strip();
-	}
 
-    public static String returnType(String OPCode){
+    public static String returnType(String opcode){
         String [] Atype={"10000","10001","10110","11010","11011","11100"};
         String [] Btype={"10010","11001"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
         String [] Ftype ={"01010"};
-        if(Arrays.asList(Atype).contains(OPCode)){
+        if(Arrays.asList(Atype).contains(opcode)){
             return "A";
         }
-        else if(Arrays.asList(Btype).contains(OPCode)){
+        else if(Arrays.asList(Btype).contains(opcode)){
             return "B";
         }
-        else if(Arrays.asList(Ctype).contains(OPCode)){
+        else if(Arrays.asList(Ctype).contains(opcode)){
             return "C";
         }
-        else if(Arrays.asList(Dtype).contains(OPCode)){
+        else if(Arrays.asList(Dtype).contains(opcode)){
             return "C";
         }
-        else if(Arrays.asList(Etype).contains(OPCode)){
+        else if(Arrays.asList(Etype).contains(opcode)){
             return "E";
         }
-        else if(Arrays.asList(Ftype).contains(OPCode)){
+        else if(Arrays.asList(Ftype).contains(opcode)){
             return "F";
         }
         else{
@@ -314,7 +220,7 @@ public class main {
             case "hlt":
                 return "01010";
             case "mov":
-                switch (instruction[2].charAt(0)){
+                switch (code[2].charAt(0)){
                     case '#':
                         return "10010";       
                     case 'r':
@@ -397,15 +303,14 @@ public class main {
             // println("Error: Variable not declared at the beginning in line $pc");
         }
         else if(Type=="hlt_missing"){
-            String error_line="Error: hlt statement missing in line "+ pc;
+            String error_line="Error: hlt statement missing in line $pc "+ pc;
             error_list.add(error_line);
             // println("Error: hlt statement missing in line $pc");
         }
         else if(Type=="hlt_not_at_end"){
-            String error_line="Error: hlt not used at the end in line "+ pc;
+            String error_line="Error: hlt not used at the end in line $pc "+ pc;
             error_list.add(error_line);
             // println("Error: hlt not used at the end in line $pc");
         }
     }
 }
-
