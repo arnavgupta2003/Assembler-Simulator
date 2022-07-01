@@ -107,8 +107,6 @@ public class main {
 		
 		//Ans Computation Handle
 		for(int insCount=0;insCount<instructions.size();insCount++) {
-
-
 			String line = instructions.get(insCount);
             
             if(line=="@#empty"){
@@ -116,6 +114,10 @@ public class main {
             }
 			
             String in[] = line.split(" ");
+            
+			String line = instructions.get(insCount);
+			String in[] = line.split(" ");
+
 			int cnt=insCount+variables.size()+1;
 			
 			//Getters
