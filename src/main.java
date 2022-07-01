@@ -3,11 +3,13 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Scanner;
 
 public class main {
-
+	//ArrayList for STDOut
+	public static ArrayList<String> error_list = new ArrayList<String>();
+    public static ArrayList<String> finalBinary = new ArrayList<String>();
+	
 	public static void main(String[] args) throws FileNotFoundException{
 		// TODO Main I/O file
 		
@@ -46,7 +48,7 @@ public class main {
 				if(isBeingGivenVar && !varGiven) {
 					varGiven=true;
 				}else if(isBeingGivenVar) {
-					//Raise var error
+					genError("var_declared_between",line_counter);
 				}
 			}else if(in[0]=="var") {
 				isVar=true;
@@ -59,24 +61,25 @@ public class main {
 				if(isBeingGivenVar && !varGiven) {
 					varGiven=true;
 				}else if(isBeingGivenVar) {
-					//Raise var error
+					genError("var_declared_between",line_counter);
 				}
 			}else {
 				isInstruct = true;
 				if(isBeingGivenVar && !varGiven) {
 					varGiven=true;
 				}else if(isBeingGivenVar) {
-					//Raise var error
+					genError("var_declared_between",line_counter);
 				}
 			}
 			
 			//Commit to lists
 			if(isVar) {
-				variables.put(in[0], line_counter);
+				variables.put(in[0], program_counter);
 			}else if(isLabel) {
-				Labels.put(in[0], line_counter);
+				Labels.put(in[0], program_counter);
+				instructions.add(genLine(in,1,in.length-1));
 			}else if(isInstruct) {
-				instructions.add(genLine(in));
+				instructions.add(genLine(in,0,in.length-1));
 			}
 			
 			
@@ -86,10 +89,10 @@ public class main {
 		
 		
 		//Ans Computation Handle
-		for(int cnt=0;cnt<instructions.size();cnt++) {
-			String line = instructions.get(cnt);
+		for(int insCount=0;insCount<instructions.size();insCount++) {
+			String line = instructions.get(insCount);
 			String in[] = line.split(" ");
-			
+			int cnt=insCount+variables.size()+1;
 			
 			//Getters
 			String OPCode = returnOP(in);
@@ -100,7 +103,7 @@ public class main {
 			//Setters
 			if (instructionType=="A"){
 				//Registers Load
-                String reg1=returnReg(in[1]);
+                String reg1=returnReg(in[1],cnt);
                 String reg2=returnReg(in[2]);
                 String reg3=returnReg(in[3]);
                 
@@ -208,73 +211,10 @@ public class main {
                 finalBinary.add(OPCode+"00000"+"00000"+"0");
                 }
             }
-
-            else if(type=="C"){
-                String reg1=returnReg(in2[1],cnt);
-                String reg2=returnReg(in2[2],cnt);
-                if(opcode=="10011"){
-                    if(checkFlag(reg2)){
-                        errorgen("illegal_flag",cnt);
-                    }
-                }
-                else{
-                    if(checkFlag(reg1) || checkFlag(reg2)){
-                        errorgen("illegal_flag",cnt);
-                    }
-                }
-                output=opcode+"00000"+reg1+reg2;
-            }
-            else if(type=="D"){
-                String reg1=returnReg(in[1],cnt);
-                if(checkFlag(reg1)){
-                    errorgen("illegal_flag",cnt);
-                }
-
-                String Memadd;
-                if ((Variablemapping.keySet().contains(in[2]))){
-                    int variable_val=Variablemapping.get(in[2]);
-                    String bin = Integer.toBinaryString(variable_val);
-                    Memadd=String.format("%08d", Integer.parseInt(bin));
-
-                }
-                else{
-                    if((Labelmapping.keySet().contains(in[2]))){
-                        errorgen("label_as_var", cnt);
-                    }
-                    else{
-                        errorgen("undefined_var", cnt);
-                    }
-                }
-                output=opcode+reg1+Memadd;
-            }
-            else if(type=="E"){
-                String Memadd;
-                if ((Labelmapping.keySet().contains(in[2]))){
-                    int label_val=Labelmapping.get(in[2]);
-                    String bin = Integer.toBinaryString(label_val);
-                    Memadd=String.format("%08d", Integer.parseInt(bin));
-
-                }
-                else{
-                    if((Variablemapping.keySet().contains(in[2]))){
-                        errorgen("var_as_label", cnt);
-                    }
-                    else{
-                        errorgen("undefined_label", cnt);
-                    }
-                }
-
-                output=opcode+"000"+Memadd;
-            }            
-            else if(type=="F"){
-                if(cnt!=no_lines){
-                    errorgen("hlt_not_at_end", cnt);
-                }
-                output=opcode+"00000"+"00000"+"0";
-
-            }
-
-		}		
+			
+		}
+		
+		
 //		//File I/O Code
 //		File f = new File("");
 //		Scanner sc_f = new Scanner(f);
@@ -346,46 +286,46 @@ public class main {
 	     return false;
 	} 
 	    
-	public static String genLine(String[] arr) {
+    public static String genLine(String[] arr,int st,int end) {
 		String ans="";
-		for(String h:arr) {
-			ans+=(h+" ");
+		for(int i=st;i<=end;i++) {
+			ans+=(arr[i]+" ");
 		}
 		return ans.strip();
 	}
 
-    public static String returnType(String opcode){
+    public static String returnType(String OPCode){
         String [] Atype={"10000","10001","10110","11010","11011","11100"};
         String [] Btype={"10010","11001"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
         String [] Ftype ={"01010"};
-        if(Arrays.asList(Atype).contains(opcode)){
+        if(Arrays.asList(Atype).contains(OPCode)){
             return "A";
         }
-        else if(Arrays.asList(Btype).contains(opcode)){
+        else if(Arrays.asList(Btype).contains(OPCode)){
             return "B";
         }
-        else if(Arrays.asList(Ctype).contains(opcode)){
+        else if(Arrays.asList(Ctype).contains(OPCode)){
             return "C";
         }
-        else if(Arrays.asList(Dtype).contains(opcode)){
+        else if(Arrays.asList(Dtype).contains(OPCode)){
             return "C";
         }
-        else if(Arrays.asList(Etype).contains(opcode)){
+        else if(Arrays.asList(Etype).contains(OPCode)){
             return "E";
         }
-        else if(Arrays.asList(Ftype).contains(opcode)){
+        else if(Arrays.asList(Ftype).contains(OPCode)){
             return "F";
         }
         else{
-            return "_";
+            return "Error in OPCode - Type";
         }
     }
 
-	public static String returnOP(String[] code,int cmt){
-        switch (code[0]){
+	public static String returnOP(String[] instruction,int cnt){
+        switch (instruction[0]){
             case "add":
                 return "10000";
             case "sub":
@@ -423,7 +363,7 @@ public class main {
             case "hlt":
                 return "01010";
             case "mov":
-                switch (code[2].charAt(0)){
+                switch (instruction[2].charAt(0)){
                     case '#':
                         return "10010";       
                     case 'r':
@@ -431,12 +371,13 @@ public class main {
                 }     
 
             }
+            genError("Typo", cnt);
             return "_";
-            errorgen("Typo", cmt);
+            
     }
 	
-	 public static String returnReg(String regs,int cmt){
-	        switch (regs){
+	 public static String returnReg(String register){
+	        switch (register){
 	            case "R0":
 	                return "000";
 	            case "R1":
@@ -454,13 +395,6 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "Error: give eligible Register";
+	        return "Error in Reg";
 	    }
-
-        // public static boolean checkFlag(String regs){
-        //     if (regs=="111"){
-        //         return true;
-        //     }
-        //     return false;
-        // }
 }
