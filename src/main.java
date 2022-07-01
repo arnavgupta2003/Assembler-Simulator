@@ -89,10 +89,10 @@ public class main {
 		
 		
 		//Ans Computation Handle
-		for(int cnt=0;cnt<instructions.size();cnt++) {
-			String line = instructions.get(cnt);
+		for(int insCount=0;insCount<instructions.size();insCount++) {
+			String line = instructions.get(insCount);
 			String in[] = line.split(" ");
-			
+			int cnt=insCount+variables.size()+1;
 			
 			//Getters
 			String OPCode = returnOP(in);
