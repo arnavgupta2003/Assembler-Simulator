@@ -74,11 +74,12 @@ public class main {
 			
 			//Commit to lists
 			if(isVar) {
-				variables.put(in[0], line_counter);
+				variables.put(in[0], program_counter);
 			}else if(isLabel) {
-				Labels.put(in[0], line_counter);
+				Labels.put(in[0], program_counter);
+				instructions.add(genLine(in,1,in.length-1));
 			}else if(isInstruct) {
-				instructions.add(genLine(in));
+				instructions.add(genLine(in,0,in.length-1));
 			}
 			
 			
@@ -285,10 +286,10 @@ public class main {
 	     return false;
 	} 
 	    
-	public static String genLine(String[] arr) {
+	public static String genLine(String[] arr,int st,int end) {
 		String ans="";
-		for(String h:arr) {
-			ans+=(h+" ");
+		for(int i=st;i<=end;i++) {
+			ans+=(arr[i]+" ");
 		}
 		return ans.strip();
 	}
