@@ -23,7 +23,7 @@ public class main {
 		int program_counter=0;
         boolean ishlt=false;
 		boolean isBeingGivenVar = false;
-		boolean varGiven=false;
+		boolean Notvar=false;
 		
 		
 		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
@@ -43,33 +43,39 @@ public class main {
 			if(line.isBlank()||line.isEmpty()) {
 				instructions.add("@#empty");//placeholder for empty
 				program_counter--;
-			}else if(in[0].charAt(in[0].length()-1)==':') {
+			}
+            else if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					genError("var_declared_between",line_counter);
-				}
-			}else if(in[0]=="var") {
+                Notvar=true;
+                if(Labels.keySet().contains(in[0])){
+                    genError("generror", line_counter);
+                }
+                else if(variables.keySet().contains(in[0])){
+                    genError("label_as_var", line_counter);
+                }
+
+			}
+            else if(in[0]=="var") {
 				isVar=true;
-				if(!isBeingGivenVar) {
-					isBeingGivenVar=true;
-				}
+                
+				if(Notvar){
+                    genError("var_declared_between", line_counter);
+                }
+                else if(variables.keySet().contains(in[0])){
+                    genError("generror", line_counter);
+                }
+                else if(Labels.keySet().contains(in[0])){
+                    genError("var_as_label", line_counter);
+                }
 				program_counter--;
-			}else if(in[0]=="hlt") {
+			}
+            else if(in[0]=="hlt") {
 				ishlt=true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					genError("var_declared_between",line_counter);
-				}
-			}else {
+                Notvar=true;
+            }
+            else {
 				isInstruct = true;
-				if(isBeingGivenVar && !varGiven) {
-					varGiven=true;
-				}else if(isBeingGivenVar) {
-					genError("var_declared_between",line_counter);
-				}
+                Notvar=true;
 			}
 			
 			//Commit to lists
@@ -90,12 +96,23 @@ public class main {
 		
 		//Ans Computation Handle
 		for(int insCount=0;insCount<instructions.size();insCount++) {
+
+
 			String line = instructions.get(insCount);
-			String in[] = line.split(" ");
+            
+            if(line=="@#empty"){
+                continue;
+            }
+			
+            String in[] = line.split(" ");
 			int cnt=insCount+variables.size()+1;
 			
 			//Getters
-			String OPCode = returnOP(in);
+            int insLenght=in.length;
+			String OPCode = returnOP(in,cnt);
+            if (OPCode=="_"){
+                continue;
+            }
 			String instructionType = returnType(OPCode);
 			
 			//#Check for bit errors 
@@ -104,8 +121,11 @@ public class main {
 			if (instructionType=="A"){
 				//Registers Load
                 String reg1=returnReg(in[1],cnt);
-                String reg2=returnReg(in[2]);
-                String reg3=returnReg(in[3]);
+                String reg2=returnReg(in[2],cnt);
+                String reg3=returnReg(in[3],cnt);
+                if(reg1=="_"||reg2=="_"||reg3=="_"){
+                    continue;
+                }
                 
                 //Error handle
                 if(checkFlag(reg1) || checkFlag(reg2) || checkFlag(reg3)){
@@ -117,38 +137,50 @@ public class main {
             }
             else if(instructionType=="B"){
             	//Registers Load
-                String reg1=returnReg(in[1]);
-                
+                String reg1=returnReg(in[1],cnt);
+                if(reg1=="_"){
+                    continue;
+                }
                 //Error handle
                 if(checkFlag(reg1)){
                     genError("illegal_flag",cnt);
-                }else {
+                    continue;
+                }
                 //	Imm Handle
                 String Imm; 
                 String Imm_val_String = in[2].substring(1, in[0].length()-1);//Took decimal Input
                 int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
+                
+                if(Imm_val_Integer>255 || Imm_val_Integer<0){
+                    genError("immediateVal", cnt);
+                    continue;
+                }
+                
                 String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
                 Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
                 
                 
                 //Function Out
                 finalBinary.add(OPCode+reg1+Imm);
-                }
             }
             else if(instructionType=="C"){
             	//Registers Load
-                String reg1=returnReg(in[1]);
-                String reg2=returnReg(in[2]);
-                
+                String reg1=returnReg(in[1],cnt);
+                String reg2=returnReg(in[2],cnt);
+                if(reg1=="_"||reg2=="_"){
+                    continue;
+                }
                 //Error handle
                 if(OPCode=="10011"){
                     if(checkFlag(reg2)){
                         genError("illegal_flag",cnt);
+                        continue;
                     }
                 }
                 else{
                     if(checkFlag(reg1) || checkFlag(reg2)){
                     	genError("illegal_flag",cnt);
+                        continue;
                     }else {
                     	//Function Out
                         finalBinary.add(OPCode+"00000"+reg1+reg2);
@@ -159,13 +191,16 @@ public class main {
             }
             else if(instructionType=="D"){
             	//Registers Load
-                String reg1=returnReg(in[1]);
+                String reg1=returnReg(in[1],cnt);
                 String Memadd = null;
-                
+                if(reg1=="_"){
+                    continue;
+                }
                 //Error Handle + processing
                 if(checkFlag(reg1)){
                     genError("illegal_flag",cnt);
-                }else {
+                }
+                else {
 	                if ((variables.keySet().contains(in[2]))){
 	                    int variable_val=variables.get(in[2]);
 	                    String bin = Integer.toBinaryString(variable_val);
@@ -181,7 +216,8 @@ public class main {
 	                //Function Out
 	                finalBinary.add(OPCode+reg1+Memadd);
                 }
-            }else if(instructionType=="E"){
+            }
+            else if(instructionType=="E"){
             	String Memadd=null;
             	
             	//Error handle + processing
@@ -206,7 +242,8 @@ public class main {
             	//Error handle
             	if(cnt!=instructions.size()-1){
                     genError("hlt_not_at_end", cnt);
-                }else {            	
+                }
+                else {            	
             	//Function Out
                 finalBinary.add(OPCode+"00000"+"00000"+"0");
                 }
@@ -230,21 +267,21 @@ public class main {
 	        
 	        String program_counter=String.valueOf(line_value);
 	        if (Type=="Typo") {
-	            String error_line=String.format("Error @~%d: Typo in line", program_counter);
+	            String error_line=String.format("Error @~%d: Typo in name of register or instruction", program_counter);
 	            error_list.add(error_line);
 	            // println("Typo in line $program_counter");
 	        }
 	        else if(Type=="undefined_var"){
-	        	String error_line=String.format("Error @~%d: Used undefined variable", program_counter);
+	        	String error_line=String.format("Error @~%d: Used undefined variable ", program_counter);
 	            error_list.add(error_line);
 	            // println("Used undefined variable in line $program_counter");
 	        }else if(Type=="undefined_label"){
-	        	String error_line=String.format("Error @~%d: Typo in line", program_counter);
+	        	String error_line=String.format("Error @~%d: Used undefined label ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used undefined label in line $program_counter");
 	        }
 	        else if(Type=="illegal_flag"){
-	        	String error_line=String.format("Error @~%d: Illegal flag usage in line", program_counter);
+	        	String error_line=String.format("Error @~%d: Illegal flag usage ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: illegal flag usage in line $program_counter");
 	        }
@@ -254,12 +291,12 @@ public class main {
 	            // println("Error: Immediate value out of given range in line $program_counter");
 	        }
 	        else if(Type=="label_as_var"){
-	        	String error_line=String.format("Error @~%d: Used label as flag in line", program_counter);
+	        	String error_line=String.format("Error @~%d: Used label as varaible ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used label as flag in line $program_counter");
 	        }
 	        else if(Type=="var_as_label"){
-	        	String error_line=String.format("Error @~%d: Used var as label in line", program_counter);
+	        	String error_line=String.format("Error @~%d: Used variable as label ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used var as label in line $program_counter");
 	        }
@@ -269,15 +306,19 @@ public class main {
 	            // println("Error: Variable not declared at the beginning in line $program_counter");
 	        }
 	        else if(Type=="hlt_missing"){
-	        	String error_line=String.format("Error @~%d: hlt statement missing in line", program_counter);
+	        	String error_line=String.format("Error @~%d: hlt statement missing ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt statement missing in line $program_counter");
 	        }
 	        else if(Type=="hlt_not_at_end"){
-	        	String error_line=String.format("Error @~%d: hlt not used at the end in line", program_counter);
+	        	String error_line=String.format("Error @~%d: hlt not used at the end ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt not used at the end in line $program_counter");
 	        }
+            else{
+                String error_line=String.format("Error @~%d: General error", program_counter);
+	            error_list.add(error_line);
+            }
 	    } 
 	public static boolean checkFlag(String regs){
 	     if (regs=="111"){
@@ -320,7 +361,7 @@ public class main {
             return "F";
         }
         else{
-            return "Error in OPCode - Type";
+            return "-";
         }
     }
 
@@ -376,7 +417,7 @@ public class main {
             
     }
 	
-	 public static String returnReg(String register){
+	 public static String returnReg(String register,int cnt){
 	        switch (register){
 	            case "R0":
 	                return "000";
@@ -395,6 +436,7 @@ public class main {
 	            case "FLAGS":
 	                return "111";
 	        }
-	        return "Error in Reg";
+            genError("Typo", cnt);
+	        return "_";
 	    }
 }
