@@ -9,7 +9,11 @@ public class main {
 	//ArrayList for STDOut
 	public static ArrayList<String> error_list = new ArrayList<String>();
     public static ArrayList<String> finalBinary = new ArrayList<String>();
-	public static String[] reservedWords = {"add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not","cmp","jmp","jlt","jgt","je","hlt","FLAGS","R0","R1","R2","R3","R4","R6","R5"}
+	public static String[] reservedWords = {"add","sub","mov","ld","st","mul","div",
+											"rs","ls","xor","or","and","not","cmp",
+											"jmp","jlt","jgt","je","hlt","FLAGS",
+											"R0","R1","R2","R3","R4","R6","R5"};
+	
 	public static void main(String[] args) throws FileNotFoundException{
 		// TODO Main I/O file
 		
@@ -53,9 +57,9 @@ public class main {
                 else if(variables.keySet().contains(in[0])){
                     genError("label_as_var", line_counter);
                 }
-                // else if(reservedWords.contains()){
+                else if(Arrays.asList(main.reservedWords).contains(in[0])){
                     
-                // }
+                }
 
 			}
             else if(in[0]=="var") {
@@ -70,9 +74,9 @@ public class main {
                 else if(Labels.keySet().contains(in[0])){
                     genError("var_as_label", line_counter);
                 }
-                // else if(in[0] in reservedWords){
+                else if(Arrays.asList(main.reservedWords).contains(in[0])){
                     
-                // }
+                }
 
 				program_counter--;
 			}
@@ -334,11 +338,8 @@ public class main {
 	     return false;
 	} 
 	    
-<<<<<<< HEAD
-	public static String genLine(String[] arr,int st,int end) {
-=======
+
     public static String genLine(String[] arr,int st,int end) {
->>>>>>> 0f15a6bb0a8bbb33fd6794761e77e8ed2d2b07a9
 		String ans="";
 		for(int i=st;i<=end;i++) {
 			ans+=(arr[i]+" ");
