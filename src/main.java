@@ -27,6 +27,10 @@ public class main {
 			boolean isLabel=false;
             if (in[0]=="var"){
                 errorgen("Var_used",cnt);
+
+            }
+            if(cnt==no_lines&&in[0]!="hlt"){
+                errorgen("hlt_missing",cnt);
             }
 			if(in[0].charAt(in[0].length()-1)==':') {
 				isLabel=true;
@@ -303,12 +307,12 @@ public class main {
             // println("Error: Variable not declared at the beginning in line $pc");
         }
         else if(Type=="hlt_missing"){
-            String error_line="Error: hlt statement missing in line $pc "+ pc;
+            String error_line="Error: hlt statement missing in line "+ pc;
             error_list.add(error_line);
             // println("Error: hlt statement missing in line $pc");
         }
         else if(Type=="hlt_not_at_end"){
-            String error_line="Error: hlt not used at the end in line $pc "+ pc;
+            String error_line="Error: hlt not used at the end in line "+ pc;
             error_list.add(error_line);
             // println("Error: hlt not used at the end in line $pc");
         }
