@@ -36,7 +36,20 @@ public class main {
         //Input Handle
 		while(sc.hasNextLine()) {//Taking input
 			String line = sc.nextLine().strip();
-			String[] in = line.split("\\s+");//change for error gens
+			String[] in = line.split(" ");
+			
+			//Handling Extra Space error
+			boolean isBlankAvailable = false;
+			for(String h:in) {
+				if(h.isBlank()||h.isEmpty()||h.equals(" ")) {
+					genError("Faulty number of spaces",line_counter);
+					isBlankAvailable=true;
+					break;
+				}
+			}
+			if(isBlankAvailable) {
+				continue;
+			}
 			
 			//Var def for checking input
 			boolean isLabel=false;boolean isVar = false;boolean isInstruct = false;
