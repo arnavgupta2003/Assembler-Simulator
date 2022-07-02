@@ -372,7 +372,7 @@ public class main {
 
     public static String returnType(String OPCode){
         String [] Atype={"10000","10001","10110","11010","11011","11100"};
-        String [] Btype={"10010","11001"};
+        String [] Btype={"10010","11001","11000"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
