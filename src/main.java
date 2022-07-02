@@ -243,8 +243,8 @@ public class main {
 	            	String Memadd=null;
 	            	
 	            	//Error handle + processing
-	            	if ((Labels.keySet().contains(in[2]))){
-	                    int label_val=Labels.get(in[2]);
+	            	if ((Labels.keySet().contains(in[1]))){
+	                    int label_val=Labels.get(in[1]);
 	                    String bin = Integer.toBinaryString(label_val);
 	                    Memadd=String.format("%08d", Integer.parseInt(bin));
 	                    
