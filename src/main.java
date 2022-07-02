@@ -170,7 +170,7 @@ public class main {
 	                }
 	                //	Imm Handle
 	                String Imm; 
-	                String Imm_val_String = in[2].substring(1, in[0].length()-1);//Took decimal Input
+	                String Imm_val_String = in[2].substring(1, in[2].length());//Took decimal Input
 	                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
 	                
 	                if(Imm_val_Integer>255 || Imm_val_Integer<0){
@@ -224,7 +224,7 @@ public class main {
 	                }
 	                else {
 		                if ((variables.keySet().contains(in[2]))){
-		                    int variable_val=variables.get(in[2]+program_counter);
+		                    int variable_val=variables.get(in[2])+program_counter;
 		                    String bin = Integer.toBinaryString(variable_val);
 		                    Memadd=String.format("%08d", Integer.parseInt(bin));
 		
@@ -262,7 +262,7 @@ public class main {
 	            }else if(instructionType.equals("F")){
 	            	
 	            	//Error handle
-	            	if(insCount+1!=program_counter+variables.size()){
+	            	if(insCount+1!=program_counter){
 	                    genError("hlt_not_at_end", cnt);
 	                }
 	                else {            	
@@ -387,7 +387,7 @@ public class main {
             return "C";
         }
         else if(Arrays.asList(Dtype).contains(OPCode)){
-            return "C";
+            return "D";
         }
         else if(Arrays.asList(Etype).contains(OPCode)){
             return "E";
@@ -440,9 +440,9 @@ public class main {
                 return "01010";
             case "mov":
                 switch (instruction[2].charAt(0)){
-                    case '#':
+                    case '$':
                         return "10010";       
-                    case 'r':
+                    case 'R':
                         return "10011";    
                 };     
 
