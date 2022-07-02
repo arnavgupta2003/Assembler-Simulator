@@ -51,38 +51,45 @@ public class main {
                 Notvar=true;
                 if(Labels.keySet().contains(in[0])){
                     genError("generror", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
                 else if(variables.keySet().contains(in[0])){
                     genError("label_as_var", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
                 else if(Arrays.asList(main.reservedWords).contains(in[0])){
                     genError("generror", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
 			}
             else if(in[0].equals("var")) {
 				isVar=true;
-                
+                program_counter--;
 				if(Notvar){
                     genError("var_declared_between", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
                 else if(variables.keySet().contains(in[1])){
                     genError("generror", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
                 else if(Labels.keySet().contains(in[1])){
                     genError("var_as_label", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
                 else if(Arrays.asList(main.reservedWords).contains(in[1])){
                     genError("generror", line_counter);
+					line_counter++;program_counter++;
                     continue;
                 }
 
-				program_counter--;
+				
 			}
             else if(in[0].equals("hlt")) {
             	isInstruct=true;
@@ -252,7 +259,7 @@ public class main {
 	                	finalBinary.add(OPCode+"000"+Memadd);
 	                }
 	                else{
-	                    if((variables.keySet().contains(in[2]))){
+	                    if((variables.keySet().contains(in[1]))){
 	                    	genError("var_as_label", cnt);
 	                    }
 	                    else{
