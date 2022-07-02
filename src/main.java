@@ -1,5 +1,5 @@
-import java.io.File;
-import java.io.FileNotFoundException;
+//import java.io.File;
+//import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +12,9 @@ public class main {
 	public static String[] reservedWords = {"add","sub","mov","ld","st","mul","div",
 											"rs","ls","xor","or","and","not","cmp",
 											"jmp","jlt","jgt","je","hlt","FLAGS",
-											"R0","R1","R2","R3","R4","R6","R5"};
+											"R0","R1","R2","R3","R4","R6","R5","var"};
 	
-	public static void main(String[] args) throws FileNotFoundException{
+	public static void main(String[] args) {
 		// TODO Main I/O file
 		
 		//var
@@ -23,12 +23,10 @@ public class main {
 		Scanner sc = new Scanner(System.in);
 		
 		
-		int line_counter=0;
+		int line_counter=1;
 		int program_counter=0;
-        boolean ishlt=false;
-		boolean isBeingGivenVar = false;
 		boolean Notvar=false;
-		
+		int hlt_count=0;
 		
 		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
         ArrayList<String> instructions = new ArrayList<String>();
@@ -53,36 +51,43 @@ public class main {
                 Notvar=true;
                 if(Labels.keySet().contains(in[0])){
                     genError("generror", line_counter);
+                    continue;
                 }
                 else if(variables.keySet().contains(in[0])){
                     genError("label_as_var", line_counter);
+                    continue;
                 }
                 else if(Arrays.asList(main.reservedWords).contains(in[0])){
                     genError("generror", line_counter);
+                    continue;
                 }
-
 			}
-            else if(in[0]=="var") {
+            else if(in[0].equals("var")) {
 				isVar=true;
                 
 				if(Notvar){
                     genError("var_declared_between", line_counter);
+                    continue;
                 }
-                else if(variables.keySet().contains(in[0])){
+                else if(variables.keySet().contains(in[1])){
                     genError("generror", line_counter);
+                    continue;
                 }
-                else if(Labels.keySet().contains(in[0])){
+                else if(Labels.keySet().contains(in[1])){
                     genError("var_as_label", line_counter);
+                    continue;
                 }
-                else if(Arrays.asList(main.reservedWords).contains(in[0])){
+                else if(Arrays.asList(main.reservedWords).contains(in[1])){
                     genError("generror", line_counter);
+                    continue;
                 }
 
 				program_counter--;
 			}
-            else if(in[0]=="hlt") {
-				ishlt=true;
+            else if(in[0].equals("hlt")) {
+            	isInstruct=true;
                 Notvar=true;
+                hlt_count++;
             }
             else {
 				isInstruct = true;
@@ -91,7 +96,7 @@ public class main {
 			
 			//Commit to lists
 			if(isVar) {
-				variables.put(in[0], program_counter);
+				variables.put(in[1], program_counter+1);
 			}else if(isLabel) {
 				Labels.put(in[0], program_counter);
 				instructions.add(genLine(in,1,in.length-1));
@@ -103,25 +108,28 @@ public class main {
 			
 			line_counter++;program_counter++;
 		}	
-		
+		sc.close();
 		
 		//Ans Computation Handle
 		for(int insCount=0;insCount<instructions.size();insCount++) {
 			String line = instructions.get(insCount);
-            
+
+			
 			int cnt=insCount+variables.size()+1;
-            if(line=="@#empty"){
+            if(line.equals("@#empty")){
                 continue;
+            }
+            if(hlt_count==0) {
+            	genError("hlt_missing", line_counter);
+            	continue;
             }
             
             //Try Block
 			try {
 				
 	            String in[] = line.split(" ");
-				
-				
+					
 				//Getters
-	            int insLenght=in.length;
 				String OPCode = returnOP(in,cnt);
 	            if (OPCode=="_"){
 	                continue;
@@ -131,7 +139,7 @@ public class main {
 				//#Check for bit errors 
 				
 				//Setters
-				if (instructionType=="A"){
+				if (instructionType.equals("A")){
 					//Registers Load
 	                String reg1=returnReg(in[1],cnt);
 	                String reg2=returnReg(in[2],cnt);
@@ -148,7 +156,7 @@ public class main {
 	                finalBinary.add(OPCode+"00"+reg1+reg2+reg3);
 	                }
 	            }
-	            else if(instructionType=="B"){
+	            else if(instructionType.equals("B")){
 	            	//Registers Load
 	                String reg1=returnReg(in[1],cnt);
 	                if(reg1=="_"){
@@ -176,7 +184,7 @@ public class main {
 	                //Function Out
 	                finalBinary.add(OPCode+reg1+Imm);
 	            }
-	            else if(instructionType=="C"){
+	            else if(instructionType.equals("C")){
 	            	//Registers Load
 	                String reg1=returnReg(in[1],cnt);
 	                String reg2=returnReg(in[2],cnt);
@@ -202,7 +210,7 @@ public class main {
 	                
 	                
 	            }
-	            else if(instructionType=="D"){
+	            else if(instructionType.equals("D")){
 	            	//Registers Load
 	                String reg1=returnReg(in[1],cnt);
 	                String Memadd = null;
@@ -230,7 +238,7 @@ public class main {
 		                finalBinary.add(OPCode+reg1+Memadd);
 	                }
 	            }
-	            else if(instructionType=="E"){
+	            else if(instructionType.equals("E")){
 	            	String Memadd=null;
 	            	
 	            	//Error handle + processing
@@ -250,10 +258,10 @@ public class main {
 	                    	genError("undefined_label", cnt);
 	                    }
 	                }
-	            }else if(instructionType=="F"){
+	            }else if(instructionType.equals("F")){
 	            	
 	            	//Error handle
-	            	if(cnt!=instructions.size()-1){
+	            	if(cnt!=line_counter){
 	                    genError("hlt_not_at_end", cnt);
 	                }
 	                else {            	
@@ -288,55 +296,54 @@ public class main {
 		
 
 	}
-	
-	 public static void genError(String Type,int line_value){
+	 public static void genError(String Type,int program_counter){//check hlt error
 	        
-	        String program_counter=String.valueOf(line_value);
-	        if (Type=="Typo") {
+	        if (Type.equals("Typo")) {
 	            String error_line=String.format("Error @~%d: Typo in name of register or instruction", program_counter);
 	            error_list.add(error_line);
+	            
 	            // println("Typo in line $program_counter");
 	        }
-	        else if(Type=="undefined_var"){
+	        else if(Type.equals("undefined_var")){
 	        	String error_line=String.format("Error @~%d: Used undefined variable ", program_counter);
 	            error_list.add(error_line);
 	            // println("Used undefined variable in line $program_counter");
-	        }else if(Type=="undefined_label"){
+	        }else if(Type.equals("undefined_label")){
 	        	String error_line=String.format("Error @~%d: Used undefined label ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used undefined label in line $program_counter");
 	        }
-	        else if(Type=="illegal_flag"){
+	        else if(Type.equals("illegal_flag")){
 	        	String error_line=String.format("Error @~%d: Illegal flag usage ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: illegal flag usage in line $program_counter");
 	        }
-	        else if(Type=="immediateVal"){
+	        else if(Type.equals("immediateVal")){
 	        	String error_line=String.format("Error @~%d: Immediate value out of given range in line", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Immediate value out of given range in line $program_counter");
 	        }
-	        else if(Type=="label_as_var"){
+	        else if(Type.equals("label_as_var")){
 	        	String error_line=String.format("Error @~%d: Used label as varaible ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used label as flag in line $program_counter");
 	        }
-	        else if(Type=="var_as_label"){
+	        else if(Type.equals("var_as_label")){
 	        	String error_line=String.format("Error @~%d: Used variable as label ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Used var as label in line $program_counter");
 	        }
-	        else if(Type=="var_declared_between"){
+	        else if(Type.equals("var_declared_between")){
 	        	String error_line=String.format("Error @~%d: Variable not declared at the beginning in line", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Variable not declared at the beginning in line $program_counter");
 	        }
-	        else if(Type=="hlt_missing"){
+	        else if(Type.equals("hlt_missing")){
 	        	String error_line=String.format("Error @~%d: hlt statement missing ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt statement missing in line $program_counter");
 	        }
-	        else if(Type=="hlt_not_at_end"){
+	        else if(Type.equals("hlt_not_at_end")){
 	        	String error_line=String.format("Error @~%d: hlt not used at the end ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt not used at the end in line $program_counter");
@@ -436,11 +443,12 @@ public class main {
                         return "10010";       
                     case 'r':
                         return "10011";    
-                }     
+                };     
 
-            }
+        }
             genError("Typo", cnt);
             return "_";
+			
             
     }
 	
