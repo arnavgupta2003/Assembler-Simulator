@@ -47,6 +47,8 @@ public class main {
 					break;
 				}
 			}
+			
+			
 			if(isBlankAvailable) {
 				continue;
 			}
