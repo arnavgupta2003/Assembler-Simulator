@@ -211,7 +211,7 @@ public class main {
                 }
                 else {
 	                if ((variables.keySet().contains(in[2]))){
-	                    int variable_val=variables.get(in[2]);
+	                    int variable_val=variables.get(in[2]+program_counter);
 	                    String bin = Integer.toBinaryString(variable_val);
 	                    Memadd=String.format("%08d", Integer.parseInt(bin));
 	
@@ -325,7 +325,7 @@ public class main {
 	            // println("Error: hlt not used at the end in line $program_counter");
 	        }
             else{
-                String error_line=String.format("Error @~%d: General error", program_counter);
+                String error_line=String.format("Error @~%d: General Syntax error", program_counter);
 	            error_list.add(error_line);
             }
 	    } 
