@@ -109,155 +109,172 @@ public class main {
 		for(int insCount=0;insCount<instructions.size();insCount++) {
 			String line = instructions.get(insCount);
             
+			int cnt=insCount+variables.size()+1;
             if(line=="@#empty"){
                 continue;
             }
-			
-            String in[] = line.split(" ");
-			int cnt=insCount+variables.size()+1;
-			
-			//Getters
-            int insLenght=in.length;
-			String OPCode = returnOP(in,cnt);
-            if (OPCode=="_"){
-                continue;
-            }
-			String instructionType = returnType(OPCode);
-			
-			//#Check for bit errors 
-			
-			//Setters
-			if (instructionType=="A"){
-				//Registers Load
-                String reg1=returnReg(in[1],cnt);
-                String reg2=returnReg(in[2],cnt);
-                String reg3=returnReg(in[3],cnt);
-                if(reg1=="_"||reg2=="_"||reg3=="_"){
-                    continue;
-                }
-                
-                //Error handle
-                if(checkFlag(reg1) || checkFlag(reg2) || checkFlag(reg3)){
-                    genError("illegal_flag",cnt);
-                }else {
-                //Function Out
-                finalBinary.add(OPCode+"00"+reg1+reg2+reg3);
-                }
-            }
-            else if(instructionType=="B"){
-            	//Registers Load
-                String reg1=returnReg(in[1],cnt);
-                if(reg1=="_"){
-                    continue;
-                }
-                //Error handle
-                if(checkFlag(reg1)){
-                    genError("illegal_flag",cnt);
-                    continue;
-                }
-                //	Imm Handle
-                String Imm; 
-                String Imm_val_String = in[2].substring(1, in[0].length()-1);//Took decimal Input
-                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
-                
-                if(Imm_val_Integer>255 || Imm_val_Integer<0){
-                    genError("immediateVal", cnt);
-                    continue;
-                }
-                
-                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
-                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
-                
-                
-                //Function Out
-                finalBinary.add(OPCode+reg1+Imm);
-            }
-            else if(instructionType=="C"){
-            	//Registers Load
-                String reg1=returnReg(in[1],cnt);
-                String reg2=returnReg(in[2],cnt);
-                if(reg1=="_"||reg2=="_"){
-                    continue;
-                }
-                //Error handle
-                if(OPCode=="10011"){
-                    if(checkFlag(reg2)){
-                        genError("illegal_flag",cnt);
-                        continue;
-                    }
-                }
-                else{
-                    if(checkFlag(reg1) || checkFlag(reg2)){
-                    	genError("illegal_flag",cnt);
-                        continue;
-                    }else {
-                    	//Function Out
-                        finalBinary.add(OPCode+"00000"+reg1+reg2);
-                    }
-                }
-                
-                
-            }
-            else if(instructionType=="D"){
-            	//Registers Load
-                String reg1=returnReg(in[1],cnt);
-                String Memadd = null;
-                if(reg1=="_"){
-                    continue;
-                }
-                //Error Handle + processing
-                if(checkFlag(reg1)){
-                    genError("illegal_flag",cnt);
-                }
-                else {
-	                if ((variables.keySet().contains(in[2]))){
-	                    int variable_val=variables.get(in[2]+program_counter);
-	                    String bin = Integer.toBinaryString(variable_val);
-	                    Memadd=String.format("%08d", Integer.parseInt(bin));
-	
-	                }else{
-	                    if((Labels.keySet().contains(in[2]))){
-	                    	genError("label_as_var", cnt);
-	                    }else{
-	                    	genError("undefined_var", cnt);
+            
+            //Try Block
+			try {
+				
+	            String in[] = line.split(" ");
+				
+				
+				//Getters
+	            int insLenght=in.length;
+				String OPCode = returnOP(in,cnt);
+	            if (OPCode=="_"){
+	                continue;
+	            }
+				String instructionType = returnType(OPCode);
+				
+				//#Check for bit errors 
+				
+				//Setters
+				if (instructionType=="A"){
+					//Registers Load
+	                String reg1=returnReg(in[1],cnt);
+	                String reg2=returnReg(in[2],cnt);
+	                String reg3=returnReg(in[3],cnt);
+	                if(reg1=="_"||reg2=="_"||reg3=="_"){
+	                    continue;
+	                }
+	                
+	                //Error handle
+	                if(checkFlag(reg1) || checkFlag(reg2) || checkFlag(reg3)){
+	                    genError("illegal_flag",cnt);
+	                }else {
+	                //Function Out
+	                finalBinary.add(OPCode+"00"+reg1+reg2+reg3);
+	                }
+	            }
+	            else if(instructionType=="B"){
+	            	//Registers Load
+	                String reg1=returnReg(in[1],cnt);
+	                if(reg1=="_"){
+	                    continue;
+	                }
+	                //Error handle
+	                if(checkFlag(reg1)){
+	                    genError("illegal_flag",cnt);
+	                    continue;
+	                }
+	                //	Imm Handle
+	                String Imm; 
+	                String Imm_val_String = in[2].substring(1, in[0].length()-1);//Took decimal Input
+	                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
+	                
+	                if(Imm_val_Integer>255 || Imm_val_Integer<0){
+	                    genError("immediateVal", cnt);
+	                    continue;
+	                }
+	                
+	                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
+	                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
+	                
+	                
+	                //Function Out
+	                finalBinary.add(OPCode+reg1+Imm);
+	            }
+	            else if(instructionType=="C"){
+	            	//Registers Load
+	                String reg1=returnReg(in[1],cnt);
+	                String reg2=returnReg(in[2],cnt);
+	                if(reg1=="_"||reg2=="_"){
+	                    continue;
+	                }
+	                //Error handle
+	                if(OPCode=="10011"){
+	                    if(checkFlag(reg2)){
+	                        genError("illegal_flag",cnt);
+	                        continue;
 	                    }
 	                }
-	                //Function Out
-	                finalBinary.add(OPCode+reg1+Memadd);
-                }
-            }
-            else if(instructionType=="E"){
-            	String Memadd=null;
-            	
-            	//Error handle + processing
-            	if ((Labels.keySet().contains(in[2]))){
-                    int label_val=Labels.get(in[2]);
-                    String bin = Integer.toBinaryString(label_val);
-                    Memadd=String.format("%08d", Integer.parseInt(bin));
-                    
-                    //Function Out
-                	finalBinary.add(OPCode+"000"+Memadd);
-                }
-                else{
-                    if((variables.keySet().contains(in[2]))){
-                    	genError("var_as_label", cnt);
-                    }
-                    else{
-                    	genError("undefined_label", cnt);
-                    }
-                }
-            }else if(instructionType=="F"){
-            	
-            	//Error handle
-            	if(cnt!=instructions.size()-1){
-                    genError("hlt_not_at_end", cnt);
-                }
-                else {            	
-            	//Function Out
-                finalBinary.add(OPCode+"00000"+"00000"+"0");
-                }
-            }
-			
+	                else{
+	                    if(checkFlag(reg1) || checkFlag(reg2)){
+	                    	genError("illegal_flag",cnt);
+	                        continue;
+	                    }else {
+	                    	//Function Out
+	                        finalBinary.add(OPCode+"00000"+reg1+reg2);
+	                    }
+	                }
+	                
+	                
+	            }
+	            else if(instructionType=="D"){
+	            	//Registers Load
+	                String reg1=returnReg(in[1],cnt);
+	                String Memadd = null;
+	                if(reg1=="_"){
+	                    continue;
+	                }
+	                //Error Handle + processing
+	                if(checkFlag(reg1)){
+	                    genError("illegal_flag",cnt);
+	                }
+	                else {
+		                if ((variables.keySet().contains(in[2]))){
+		                    int variable_val=variables.get(in[2]+program_counter);
+		                    String bin = Integer.toBinaryString(variable_val);
+		                    Memadd=String.format("%08d", Integer.parseInt(bin));
+		
+		                }else{
+		                    if((Labels.keySet().contains(in[2]))){
+		                    	genError("label_as_var", cnt);
+		                    }else{
+		                    	genError("undefined_var", cnt);
+		                    }
+		                }
+		                //Function Out
+		                finalBinary.add(OPCode+reg1+Memadd);
+	                }
+	            }
+	            else if(instructionType=="E"){
+	            	String Memadd=null;
+	            	
+	            	//Error handle + processing
+	            	if ((Labels.keySet().contains(in[2]))){
+	                    int label_val=Labels.get(in[2]);
+	                    String bin = Integer.toBinaryString(label_val);
+	                    Memadd=String.format("%08d", Integer.parseInt(bin));
+	                    
+	                    //Function Out
+	                	finalBinary.add(OPCode+"000"+Memadd);
+	                }
+	                else{
+	                    if((variables.keySet().contains(in[2]))){
+	                    	genError("var_as_label", cnt);
+	                    }
+	                    else{
+	                    	genError("undefined_label", cnt);
+	                    }
+	                }
+	            }else if(instructionType=="F"){
+	            	
+	            	//Error handle
+	            	if(cnt!=instructions.size()-1){
+	                    genError("hlt_not_at_end", cnt);
+	                }
+	                else {            	
+	            	//Function Out
+	                finalBinary.add(OPCode+"00000"+"00000"+"0");
+	                }
+	            }
+			}catch(Exception e) {
+				genError("Gen-Error", cnt);
+			}
+		}
+		
+		//STDOut
+		if(error_list.size()!=0) {
+			for(String h:error_list) {
+				System.out.println(h);
+			}
+		}else {
+			for(String h:finalBinary) {
+				System.out.println(h);
+			}
 		}
 		
 		
