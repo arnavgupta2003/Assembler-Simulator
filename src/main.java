@@ -111,6 +111,11 @@ public class main {
 		sc.close();
 		
 		//Ans Computation Handle
+		
+		if(hlt_count==0) {
+			genError("hlt_missing", line_counter);
+		}
+
 		for(int insCount=0;insCount<instructions.size();insCount++) {
 			String line = instructions.get(insCount);
 
@@ -118,10 +123,6 @@ public class main {
 			int cnt=insCount+variables.size()+1;
             if(line.equals("@#empty")){
                 continue;
-            }
-            if(hlt_count==0) {
-            	genError("hlt_missing", line_counter);
-            	continue;
             }
             
             //Try Block
@@ -261,7 +262,7 @@ public class main {
 	            }else if(instructionType.equals("F")){
 	            	
 	            	//Error handle
-	            	if(cnt!=line_counter){
+	            	if(insCount+1!=program_counter+variables.size()){
 	                    genError("hlt_not_at_end", cnt);
 	                }
 	                else {            	
