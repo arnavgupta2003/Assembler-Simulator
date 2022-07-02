@@ -58,7 +58,7 @@ public class main {
                     genError("label_as_var", line_counter);
                 }
                 else if(Arrays.asList(main.reservedWords).contains(in[0])){
-                    
+                    genError("generror", line_counter);
                 }
 
 			}
@@ -75,7 +75,7 @@ public class main {
                     genError("var_as_label", line_counter);
                 }
                 else if(Arrays.asList(main.reservedWords).contains(in[0])){
-                    
+                    genError("generror", line_counter);
                 }
 
 				program_counter--;
