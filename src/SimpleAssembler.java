@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class main {
+public class SimpleAssembler {
 	//ArrayList for STDOut
 	public static ArrayList<String> error_list = new ArrayList<String>();
     public static ArrayList<String> finalBinary = new ArrayList<String>();
@@ -21,7 +21,7 @@ public class main {
 		
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
-		
+			
 		
 		int line_counter=1;
 		int program_counter=0;
@@ -42,7 +42,7 @@ public class main {
 			boolean isBlankAvailable = false;
 			for(String h:in) {
 				if(h.isBlank()||h.isEmpty()||h.equals(" ")) {
-					genError("Faulty_spaces",line_counter);
+					genError("Faulty number of spaces",line_counter);
 					isBlankAvailable=true;
 					break;
 				}
@@ -74,16 +74,11 @@ public class main {
 					line_counter++;program_counter++;
                     continue;
                 }
-                else if(Arrays.asList(main.reservedWords).contains(in[0])){
+                else if(Arrays.asList(SimpleAssembler.reservedWords).contains(in[0])){
                     genError("generror", line_counter);
 					line_counter++;program_counter++;
                     continue;
                 }
-                if(in.length>=2) {
-	                if(in[1].equals("hlt")) {
-	                	hlt_count++;
-	                }
-                }    
 			}
             else if(in[0].equals("var")) {
 				isVar=true;
@@ -103,7 +98,7 @@ public class main {
 					line_counter++;program_counter++;
                     continue;
                 }
-                else if(Arrays.asList(main.reservedWords).contains(in[1])){
+                else if(Arrays.asList(SimpleAssembler.reservedWords).contains(in[1])){
                     genError("generror", line_counter);
 					line_counter++;program_counter++;
                     continue;
@@ -156,7 +151,7 @@ public class main {
 			try {
 				
 	            String in[] = line.split(" ");
-				
+					
 				//Getters
 				String OPCode = returnOP(in,cnt);
 	            if (OPCode=="_"){
@@ -225,17 +220,12 @@ public class main {
 	                        genError("illegal_flag",cnt);
 	                        continue;
 	                    }
-						else {
-	                    	//Function Out
-	                        finalBinary.add(OPCode+"00000"+reg1+reg2);
-	                    }
 	                }
 	                else{
 	                    if(checkFlag(reg1) || checkFlag(reg2)){
 	                    	genError("illegal_flag",cnt);
 	                        continue;
-	                    }
-						else {
+	                    }else {
 	                    	//Function Out
 	                        finalBinary.add(OPCode+"00000"+reg1+reg2);
 	                    }
@@ -275,8 +265,8 @@ public class main {
 	            	String Memadd=null;
 	            	
 	            	//Error handle + processing
-	            	if ((Labels.keySet().contains(in[1].concat(":")))){
-	                    int label_val=Labels.get(in[1].concat(":"));
+	            	if ((Labels.keySet().contains(in[1]))){
+	                    int label_val=Labels.get(in[1]);
 	                    String bin = Integer.toBinaryString(label_val);
 	                    Memadd=String.format("%08d", Integer.parseInt(bin));
 	                    
@@ -328,7 +318,6 @@ public class main {
 //		}
 		
 
-
 	}
 	 public static void genError(String Type,int program_counter){//check hlt error
 	        
@@ -353,7 +342,7 @@ public class main {
 	            // println("Error: illegal flag usage in line $program_counter");
 	        }
 	        else if(Type.equals("immediateVal")){
-	        	String error_line=String.format("Error @~%d: Immediate value out of given range ", program_counter);
+	        	String error_line=String.format("Error @~%d: Immediate value out of given range in line", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Immediate value out of given range in line $program_counter");
 	        }
@@ -368,7 +357,7 @@ public class main {
 	            // println("Error: Used var as label in line $program_counter");
 	        }
 	        else if(Type.equals("var_declared_between")){
-	        	String error_line=String.format("Error @~%d: Variable not declared at the beginning ", program_counter);
+	        	String error_line=String.format("Error @~%d: Variable not declared at the beginning in line", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: Variable not declared at the beginning in line $program_counter");
 	        }
@@ -379,11 +368,6 @@ public class main {
 	        }
 	        else if(Type.equals("hlt_not_at_end")){
 	        	String error_line=String.format("Error @~%d: hlt not used at the end ", program_counter);
-	            error_list.add(error_line);
-	            // println("Error: hlt not used at the end in line $program_counter");
-	        }
-			else if(Type.equals("Faulty_spaces")){
-	        	String error_line=String.format("Error @~%d: Faulty number of spaces used", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt not used at the end in line $program_counter");
 	        }
