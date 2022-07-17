@@ -1,6 +1,20 @@
-import sys
-import math
+from sys import stdin
 
+PC=0
+MemStack=["0000000000000000"]*256
+InsStack=[]
+# def __init__():
+#     for line in stdin:
+#         opcode=line[0:4]
+#         #handle in
+#         PC+=1
+#         InsStack.append(line)
+#         print(line)
+
+
+def MemDump():
+    for i in MemStack:
+        print(i)
 
 def operatorCall(List,i,l):
     if (i==l):
@@ -67,5 +81,7 @@ def operatorCall(List,i,l):
         return operatorCall(List, i + 1, l)
 
 
-
+# while (line!="hlt"):#hlt opcode
+#     PC+=1
+#     InsStack.append(line)
 
