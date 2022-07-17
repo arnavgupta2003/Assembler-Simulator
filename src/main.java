@@ -79,6 +79,11 @@ public class main {
 					line_counter++;program_counter++;
                     continue;
                 }
+                if(in.length>=2) {
+	                if(in[1].equals("hlt")) {
+	                	hlt_count++;
+	                }
+                }    
 			}
             else if(in[0].equals("var")) {
 				isVar=true;
@@ -270,8 +275,8 @@ public class main {
 	            	String Memadd=null;
 	            	
 	            	//Error handle + processing
-	            	if ((Labels.keySet().contains(in[1]))){
-	                    int label_val=Labels.get(in[1]);
+	            	if ((Labels.keySet().contains(in[1].concat(":")))){
+	                    int label_val=Labels.get(in[1].concat(":"));
 	                    String bin = Integer.toBinaryString(label_val);
 	                    Memadd=String.format("%08d", Integer.parseInt(bin));
 	                    
