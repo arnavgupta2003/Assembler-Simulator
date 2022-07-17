@@ -16,6 +16,40 @@ def MemDump():
     for i in MemStack:
         print(i)
 
+def binadd(a,b):
+    summ = bin(int(a, 2) + int(b, 2))
+    summ=summ[2:]
+    summ.zfill(16)
+    return summ
+
+def binsub(a,b):
+    diff = bin(int(a, 2) - int(b, 2))
+    diff=diff[2:]
+    diff.zfill(16)
+    return diff
+
+def binmul(a,b):
+    mul = bin(int(a, 2) * int(b, 2))
+    mul=mul[2::]
+    if(len(mul)>16):
+        mul=mul[len(mul)-16::]
+    else:
+        mul=mul.zfill(16)
+    return mul
+
+def bindiv(a,b):
+    div = bin(int(a, 2) / int(b, 2))
+    div=div[2:]
+    div.zfill(16)
+    return div
+
+    
+
+def return_reg(a):
+    pass
+def update_reg(a):
+    pass
+
 def operatorCall(List,i,l):
     if (i==l):
         return
@@ -84,4 +118,25 @@ def operatorCall(List,i,l):
 # while (line!="hlt"):#hlt opcode
 #     PC+=1
 #     InsStack.append(line)
+
+def Addition(List,i):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binadd(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Subtraction(List,i):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binsub(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Multiply(List,i):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binmul(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
 
