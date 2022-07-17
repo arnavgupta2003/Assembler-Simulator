@@ -1,0 +1,8 @@
+r1='000001101011111'
+imm=5
+if(imm>16):
+        newval="0"*16
+else:
+        newval="0"*imm+r1[0:16-imm]
+
+print(newval)

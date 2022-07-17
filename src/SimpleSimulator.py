@@ -1,6 +1,10 @@
 from sys import stdin
+from uuid import RFC_4122
 
-PC=0
+from numpy import right_shift
+
+global pc
+pc=0
 MemStack=["0000000000000000"]*256
 InsStack=[]
 # def __init__():
@@ -47,69 +51,162 @@ def bindiv(a,b):
 
 def return_reg(a):
     pass
+
 def update_reg(a):
+    pass
+
+def Addition(List):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binadd(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Subtraction(List):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binsub(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Multiply(List):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=binmul(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Divide(List):
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    newval=bindiv(r1,r2)
+    r3=List[13:]
+    update_reg(r3,newval)
+
+def Move_Immediate(List):
+    imm=List[8:]
+    r1=List[5:8]
+    update_reg(r1,imm)
+
+def Move_Register(List):
+    r1=return_reg(List[10:13])
+    r2=List[13:]
+    update_reg(r2,r1)
+
+def Load(List):
+    pass
+
+def Store(List):
+    pass
+
+def Right_Shift(List):
+    r1=return_reg(List[5:8])
+    imm=int(List[8:],2)
+    if(imm>16):
+        newval="0"*16
+    else:
+        newval="0"*imm+r1[0:16-imm]
+    update_reg(List[5:8],newval)
+
+def Left_Shift(List):
+    r1=return_reg(List[5:8])
+    imm=int(List[8:],2)
+    if(imm>16):
+        newval="0"*16
+    else:
+        newval=r1[16-imm::]+"0"*imm
+    update_reg(List[5:8],newval)
+    
+def Exclusive_OR(List):
+    pass
+
+def Or(List):
+    pass
+
+def And(List):
+    pass
+
+def Invert(List):
+    pass
+
+def Compare(List):
+    pass
+
+def Unconditional_Jump(List):
+    pass
+
+def Jump_If_Less_Than(List):
+    pass
+
+def Jump_If_Greater_Than(List):
+    pass
+
+def Jump_If_Equal(List):
+    pass
+
+def Halt(List):
     pass
 
 def operatorCall(List,pc):
     if (List[pc][:5] == "10000"):
-        Addition(List, i)
+        Addition(List[pc])
 
     elif (List[pc][:5] == "10001"):
-        Subtraction(List, i)
+        Subtraction(List[pc])
 
     elif (List[pc][:5] == "10010"):
-        Move_Immediate(List, i)
+        Move_Immediate(List[pc])
 
     elif (List[pc][:5] == "10011"):
-        Move_Register(List, i)
+        Move_Register(List[pc])
 
     elif (List[pc][:5] == "10100"):
-        Load(List, i)
+        Load(List[pc])
 
     elif (List[pc][:5] == "10101"):
-        Store(List, i)
+        Store(List[pc])
 
     elif (List[pc][:5] == "10110"):
-        Multiply(List, i)
+        Multiply(List[pc])
 
     elif (List[pc][:5] == "10111"):
-        Divide(List, i)
+        Divide(List[pc])
 
     elif (List[pc][:5] == "11000"):
-        Right_Shift(List, i)
+        Right_Shift(List[pc])
 
     elif (List[pc][:5] == "11001"):
-        Left_Shift(List, i)
+        Left_Shift(List[pc])
 
     elif (List[pc][:5] == "11010"):
-        Exclusive_OR(List, i)
+        Exclusive_OR(List[pc])
 
     elif (List[pc][:5] == "11011"):
-        Or(List, i)
+        Or(List[pc])
 
     elif (List[pc][:5] == "11100"):
-        And(List, i)
+        And(List[pc])
 
     elif (List[pc][:5] == "11101"):
-        Invert(List, i)
+        Invert(List[pc])
 
     elif (List[pc][:5] == "11110"):
-        Compare(List, i)
+        Compare(List[pc])
 
     elif (List[pc][:5] == "11111"):
-        Unconditional_Jump(List, i)
+        Unconditional_Jump(List[pc])
 
     elif (List[pc][:5] == "01100"):
-        Jump_If_Less_Than(List, i)
+        Jump_If_Less_Than(List[pc])
 
     elif (List[pc][:5] == "01101"):
-        Jump_If_Greater_Than(List, i)
+        Jump_If_Greater_Than(List[pc])
 
     elif (List[pc][:5] == "01111"):
-        Jump_If_Equal(List, i)
+        Jump_If_Equal(List[pc])
 
     elif (List[pc][:5] == "01010"):
-        Halt(List, i)
+        Halt(List[pc])
 
 
 
@@ -117,24 +214,5 @@ def operatorCall(List,pc):
 #     PC+=1
 #     InsStack.append(line)
 
-def Addition(List,i):
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-    newval=binadd(r1,r2)
-    r3=List[13:]
-    update_reg(r3,newval)
 
-def Subtraction(List,i):
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-    newval=binsub(r1,r2)
-    r3=List[13:]
-    update_reg(r3,newval)
-
-def Multiply(List,i):
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-    newval=binmul(r1,r2)
-    r3=List[13:]
-    update_reg(r3,newval)
 
