@@ -1,7 +1,6 @@
 from sys import stdin
 from uuid import RFC_4122
 
-from numpy import right_shift
 
 global pc,halt
 halt=0
@@ -24,13 +23,18 @@ def MemDump():
 def binadd(a,b):
     summ = bin(int(a, 2) + int(b, 2))
     summ=summ[2:]
-    summ.zfill(16)
+    summ=summ.zfill(16)
     return summ
 
 def binsub(a,b):
     diff = bin(int(a, 2) - int(b, 2))
-    diff=diff[2:]
-    diff.zfill(16)
+    if(diff[0]=='-'):
+        diff=diff[3:]
+        diff=diff.zfill(15)
+        diff='-'+diff
+    else:
+        diff=diff[2:]
+        diff=diff.zfill(16)
     return diff
 
 def binmul(a,b):
@@ -45,7 +49,7 @@ def binmul(a,b):
 def bindiv(a,b):
     div = bin(int(a, 2) / int(b, 2))
     div=div[2:]
-    div.zfill(16)
+    div=div.zfill(16)
     return div
 
     
@@ -61,6 +65,20 @@ def Addition(List):
     r2=return_reg(List[10:13])
     newval=binadd(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+    
     update_reg(r3,newval)
 
 def Subtraction(List):
@@ -68,6 +86,20 @@ def Subtraction(List):
     r2=return_reg(List[10:13])
     newval=binsub(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+
     update_reg(r3,newval)
 
 def Multiply(List):
@@ -75,6 +107,20 @@ def Multiply(List):
     r2=return_reg(List[10:13])
     newval=binmul(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+
     update_reg(r3,newval)
 
 def Divide(List):
@@ -240,6 +286,3 @@ def operatorCall(List,pc):
 # while (line!="hlt"):#hlt opcode
 #     PC+=1
 #     InsStack.append(line)
-
-
-
