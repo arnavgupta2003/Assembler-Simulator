@@ -68,10 +68,8 @@ def Addition(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
@@ -89,10 +87,7 @@ def Subtraction(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
@@ -110,10 +105,7 @@ def Multiply(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
@@ -164,16 +156,33 @@ def Left_Shift(List):
     update_reg(List[5:8],newval)
     
 def Exclusive_OR(List):
-    pass
+    r1 = int(return_reg(List[7:10]),2)
+    r2 = int(return_reg(List[10:13]),2)
+    newval = bin(r1^r2)[2:]
+    r3 = List[13:]
+    update_reg(r3, newval)
+
 
 def Or(List):
-    pass
+    r1 = int(return_reg(List[7:10]),2)
+    r2 = int(return_reg(List[10:13]),2)
+    newval = bin(r1 | r2)[2:]
+    r3 = List[13:]
+    update_reg(r3, newval)
 
 def And(List):
-    pass
+    r1 = int(return_reg(List[7:10]),2)
+    r2 = int(return_reg(List[10:13]),2)
+    newval = bin(r1 & r2)[2:]
+    r3 = List[13:]
+    update_reg(r3, newval)
 
 def Invert(List):
-    pass
+    r1 = return_reg(List[10:13],2)
+
+    newval = bin(~r1)[2:]
+    r3 = List[13:]
+    update_reg(r3, newval)
 
 def Compare(List):
     r1=int(return_reg(List[8:13]),2)
