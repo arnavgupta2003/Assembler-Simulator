@@ -1,9 +1,9 @@
 from sys import stdin
 from uuid import RFC_4122
 
-from numpy import right_shift
 
-global pc
+global pc,halt
+halt=0
 pc=0
 MemStack=["0000000000000000"]*256
 InsStack=[]
@@ -23,13 +23,18 @@ def MemDump():
 def binadd(a,b):
     summ = bin(int(a, 2) + int(b, 2))
     summ=summ[2:]
-    summ.zfill(16)
+    summ=summ.zfill(16)
     return summ
 
 def binsub(a,b):
     diff = bin(int(a, 2) - int(b, 2))
-    diff=diff[2:]
-    diff.zfill(16)
+    if(diff[0]=='-'):
+        diff=diff[3:]
+        diff=diff.zfill(15)
+        diff='-'+diff
+    else:
+        diff=diff[2:]
+        diff=diff.zfill(16)
     return diff
 
 def binmul(a,b):
@@ -44,7 +49,7 @@ def binmul(a,b):
 def bindiv(a,b):
     div = bin(int(a, 2) / int(b, 2))
     div=div[2:]
-    div.zfill(16)
+    div=div.zfill(16)
     return div
 
     
@@ -60,6 +65,20 @@ def Addition(List):
     r2=return_reg(List[10:13])
     newval=binadd(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+    
     update_reg(r3,newval)
 
 def Subtraction(List):
@@ -67,6 +86,20 @@ def Subtraction(List):
     r2=return_reg(List[10:13])
     newval=binsub(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+
     update_reg(r3,newval)
 
 def Multiply(List):
@@ -74,6 +107,20 @@ def Multiply(List):
     r2=return_reg(List[10:13])
     newval=binmul(r1,r2)
     r3=List[13:]
+    if(newval[0]=='-'):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        if(len(newval)==17):
+            newval=newval[1:]
+        else:
+            newval='0'+newval[1:]
+    elif(int(newval,2)>2**15):
+        Flag='1000'
+        Flag=Flag.zfill(16)
+        update_reg('111',Flag)
+        newval=newval[len(newval)-16:]
+
     update_reg(r3,newval)
 
 def Divide(List):
@@ -130,22 +177,48 @@ def Invert(List):
     pass
 
 def Compare(List):
-    pass
+    r1=int(return_reg(List[8:13]),2)
+    r2=int(return_reg(List[13:]),2)
+
+    if(r1==r2):
+        newval='1'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
+    elif(r1>r2):
+        newval='10'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
+    elif(r1<r2):
+        newval='100'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
 
 def Unconditional_Jump(List):
-    pass
+    global pc
+    pc=int(List[8:],2)
 
 def Jump_If_Less_Than(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==4):
+        pc=int(List[8:],2)
 
 def Jump_If_Greater_Than(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==2):
+        pc=int(List[8:],2)
+
 
 def Jump_If_Equal(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==1):
+        pc=int(List[8:],2)
 
 def Halt(List):
-    pass
+    global halt
+    halt=1
 
 def operatorCall(List,pc):
     if (List[pc][:5] == "10000"):
@@ -213,6 +286,3 @@ def operatorCall(List,pc):
 # while (line!="hlt"):#hlt opcode
 #     PC+=1
 #     InsStack.append(line)
-
-
-
