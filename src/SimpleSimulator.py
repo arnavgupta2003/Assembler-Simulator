@@ -3,7 +3,8 @@ from uuid import RFC_4122
 
 from numpy import right_shift
 
-global pc
+global pc,halt
+halt=0
 pc=0
 MemStack=["0000000000000000"]*256
 InsStack=[]
@@ -130,22 +131,48 @@ def Invert(List):
     pass
 
 def Compare(List):
-    pass
+    r1=int(return_reg(List[8:13]),2)
+    r2=int(return_reg(List[13:]),2)
+
+    if(r1==r2):
+        newval='1'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
+    elif(r1>r2):
+        newval='10'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
+    elif(r1<r2):
+        newval='100'
+        newval=newval.zfill(16)
+        update_reg('111',newval)
 
 def Unconditional_Jump(List):
-    pass
+    global pc
+    pc=int(List[8:],2)
 
 def Jump_If_Less_Than(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==4):
+        pc=int(List[8:],2)
 
 def Jump_If_Greater_Than(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==2):
+        pc=int(List[8:],2)
+
 
 def Jump_If_Equal(List):
-    pass
+    global pc
+    Flag=int(return_reg("111"),2)
+    if(Flag==1):
+        pc=int(List[8:],2)
 
 def Halt(List):
-    pass
+    global halt
+    halt=1
 
 def operatorCall(List,pc):
     if (List[pc][:5] == "10000"):
