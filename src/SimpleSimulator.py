@@ -69,10 +69,8 @@ def Addition(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
@@ -90,10 +88,7 @@ def Subtraction(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
@@ -111,10 +106,7 @@ def Multiply(List):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        if(len(newval)==17):
-            newval=newval[1:]
-        else:
-            newval='0'+newval[1:]
+        newval='0'*16
     elif(int(newval,2)>2**15):
         Flag='1000'
         Flag=Flag.zfill(16)
