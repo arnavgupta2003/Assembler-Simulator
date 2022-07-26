@@ -1,5 +1,5 @@
 from sys import stdin
-    
+
 def MemDump():
     for i in MemStack:
         print(i)
@@ -45,6 +45,7 @@ def update_reg(a,b):
     RegStack[val]=b
 
 def Addition(List):
+    global pc
     r1=return_reg(List[7:10])
     r2=return_reg(List[10:13])
     newval=binadd(r1,r2)
@@ -62,8 +63,10 @@ def Addition(List):
         newval=newval[len(newval)-16:]
     
     update_reg(r3,newval)
+    pc+=1
 
 def Subtraction(List):
+    global pc
     r1=return_reg(List[7:10])
     r2=return_reg(List[10:13])
     newval=binsub(r1,r2)
@@ -80,8 +83,10 @@ def Subtraction(List):
         newval=newval[len(newval)-16:]
 
     update_reg(r3,newval)
+    pc+=1
 
 def Multiply(List):
+    global pc
     r1=return_reg(List[7:10])
     r2=return_reg(List[10:13])
     newval=binmul(r1,r2)
@@ -98,39 +103,49 @@ def Multiply(List):
         newval=newval[len(newval)-16:]
 
     update_reg(r3,newval)
+    pc+=1
 
 def Divide(List):
+    global pc
     r1=return_reg(List[7:10])
     r2=return_reg(List[10:13])
     newval=bindiv(r1,r2)
     r3=List[13:]
     update_reg(r3,newval)
+    pc+=1
 
 def Move_Immediate(List):
+    global pc
     imm=List[8:]
     imm=imm.zfill(16)
     r1=List[5:8]
     update_reg(r1,imm)
+    pc+=1
 
 def Move_Register(List):
+    global pc
     r1=return_reg(List[10:13])
     r2=List[13:]
     update_reg(r2,r1)
+    pc+=1
 
 def Load(List):
-    global MemStack
+    global MemStack,pc
     mem=List[8:]
     memadd=int(mem,2)
     update_reg(List[5:8],MemStack[memadd])
+    pc+=1
 
 def Store(List):
-    global MemStack
+    global MemStack,pc
     r1=return_reg(List[5:8])
     mem=List[8:]
     memadd=int(mem,2)
     MemStack[memadd]=r1
+    pc+=1
 
 def Right_Shift(List):
+    global pc
     r1=return_reg(List[5:8])
     imm=int(List[8:],2)
     if(imm>16):
@@ -138,8 +153,10 @@ def Right_Shift(List):
     else:
         newval="0"*imm+r1[0:16-imm]
     update_reg(List[5:8],newval)
+    pc+=1
 
 def Left_Shift(List):
+    global pc
     r1=return_reg(List[5:8])
     imm=int(List[8:],2)
     if(imm>16):
@@ -147,36 +164,46 @@ def Left_Shift(List):
     else:
         newval=r1[16-imm::]+"0"*imm
     update_reg(List[5:8],newval)
-    
+    pc+=1
+
 def Exclusive_OR(List):
+    global pc
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1^r2)[2:]
     r3 = List[13:]
     update_reg(r3, newval)
+    pc+=1
 
 def Or(List):
+    global pc
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1 | r2)[2:]
     r3 = List[13:]
     update_reg(r3, newval)
+    pc+=1
 
 def And(List):
+    global pc
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1 & r2)[2:]
     r3 = List[13:]
     update_reg(r3, newval)
+    pc+=1
 
 def Invert(List):
+    global pc
     r1 = return_reg(List[10:13],2)
 
     newval = bin(~r1)[2:]
     r3 = List[13:]
     update_reg(r3, newval)
+    pc+=1
 
 def Compare(List):
+    global pc
     r1=int(return_reg(List[8:13]),2)
     r2=int(return_reg(List[13:]),2)
 
@@ -192,10 +219,14 @@ def Compare(List):
         newval='100'
         newval=newval.zfill(16)
         update_reg('111',newval)
+    
+    pc+=1
 
 def Unconditional_Jump(List):
     global pc
     pc=int(List[8:],2)
+
+
 
 def Jump_If_Less_Than(List):
     global pc
@@ -208,15 +239,21 @@ def Jump_If_Greater_Than(List):
     Flag=int(return_reg("111"),2)
     if(Flag==2):
         pc=int(List[8:],2)
+    else:
+            pc+=1
 
 def Jump_If_Equal(List):
     global pc
     Flag=int(return_reg("111"),2)
     if(Flag==1):
         pc=int(List[8:],2)
+    else:
+        pc+=1
+
 
 def Halt(List):
-    global halt
+    global halt,pc
+    pc+=1
     halt=1
 
 def operatorCall(List,pc):
@@ -283,19 +320,23 @@ def operatorCall(List,pc):
 global pc,halt,MemStack
 halt=0
 pc=0
+cycle=0
 RegStack=["0000000000000000"]*8
 MemStack=["0000000000000000"]*256
-
+lines=[]
 for line in stdin:
     line=line[:-1]
-    opcode=line[0:4]
+    lines.append(line)
+
+
+while (True):
     MemStack[pc]=line
-    operatorCall(line,pc)
     pc_val=bin(pc)[2:]
     pc_val=pc_val.zfill(8)
+    operatorCall(line,pc)
     print(pc_val,end=' ')
     print(*RegStack)
-    pc+=1
+    cycle+=1
     if(halt==1):
         break
 
