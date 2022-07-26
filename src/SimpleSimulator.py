@@ -2,22 +2,6 @@ from sys import stdin
 from uuid import RFC_4122
 
 
-global pc,halt
-halt=0
-pc=0
-RegStack=["0000000000000000"]*8
-VarStack=[]
-MemStack=["0000000000000000"]*256
-InsStack=[]
-
-for line in stdin:
-    opcode=line[0:4]
-    #handle in
-    pc+=1
-    InsStack.append(line)
-    #print(line)
-
-
 def MemDump():
     for i in MemStack:
         print(i)
@@ -54,15 +38,13 @@ def bindiv(a,b):
     div=div.zfill(16)
     return div
 
-    
-
 def return_reg(a):
     val=int(a,2)
     return RegStack[val]
 
 def update_reg(a,b):
     val=int(a,2)
-    RegStack[val]=b;
+    RegStack[val]=b
 
 def Addition(List):
     r1=return_reg(List[7:10])
@@ -137,10 +119,17 @@ def Move_Register(List):
     update_reg(r2,r1)
 
 def Load(List):
-    pass
+    global MemStack
+    mem=List[8:]
+    memadd=int(mem,2)
+    update_reg(List[5:8],MemStack[memadd])
 
 def Store(List):
-    pass
+    global MemStack
+    r1=return_reg(List[5:8])
+    mem=List[8:]
+    memadd=int(mem,2)
+    MemStack[memadd]=r1
 
 def Right_Shift(List):
     r1=return_reg(List[5:8])
@@ -166,7 +155,6 @@ def Exclusive_OR(List):
     newval = bin(r1^r2)[2:]
     r3 = List[13:]
     update_reg(r3, newval)
-
 
 def Or(List):
     r1 = int(return_reg(List[7:10]),2)
@@ -221,7 +209,6 @@ def Jump_If_Greater_Than(List):
     Flag=int(return_reg("111"),2)
     if(Flag==2):
         pc=int(List[8:],2)
-
 
 def Jump_If_Equal(List):
     global pc
@@ -294,9 +281,19 @@ def operatorCall(List,pc):
     elif (List[pc][:5] == "01010"):
         Halt(List[pc])
 
+global pc,halt,MemStack
+halt=0
+pc=0
+RegStack=["0000000000000000"]*8
+MemStack=["0000000000000000"]*256
 
+for line in stdin:
+    line=line[:-1]
+    opcode=line[0:4]
+    MemStack[pc]=line
+    operatorCall(line,pc)
+    print(bin(pc)[2:])
+    print(*RegStack)
+    pc+=1
 
-# while (line!="hlt"):#hlt opcode
-#     PC+=1
-#     InsStack.append(line)
-print(f"{5}",)
+print('\n'.join(MemStack))
