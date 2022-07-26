@@ -11,7 +11,7 @@ def bin_val_after_decimal(bin):
     sum=0
     for i in range(j,len(bin)):
         if(bin[i]==1):
-            sum+=1/(2^(i+1))
+            sum+=1/(2**(i+1-j))
     return sum
 def bin_val_before_decimal(bin):
     j=0
@@ -33,21 +33,42 @@ def ieee_to_decimal(ieee):
     binary='1'+mantissa
     int_binary=int(binary)
     final_bin=int_binary/10^(len(binary)-1-exponent)
-    # decimal=int(final_bin,2)
+
     decimal=bin_val_after_decimal(str(final_bin))+bin_val_before_decimal(str(final_bin))
     return decimal
 
-def f_addition(n1,n2,r3):
-    val=ieee_to_decimal(n1)+ieee_to_decimal(n2)
+def f_addition(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+
+    r3=List[13:]
+
+    val=ieee_to_decimal(r1)+ieee_to_decimal(r2)
+
+    # make val binary
+
     update_reg(r3, val)
     pc += 1
 
 
-def f_subtraction(n1,n2,r3):
-    val=ieee_to_decimal(n1)-ieee_to_decimal(n2)
+def f_subtraction(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+
+    r3=List[13:]
+    # make val binary
+    val=ieee_to_decimal(r1)-ieee_to_decimal(r2)
     update_reg(r3,val)
     pc+=1
-def moveF_immediate(imm,r1):
+def moveF_immediate(List):
+    global pc
+    imm = List[8:]
+    # imm = imm.zfill(16)
+    r1 = List[5:8]
     update_reg(r1, imm)
     pc += 1
 
