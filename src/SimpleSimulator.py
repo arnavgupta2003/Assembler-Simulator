@@ -1,17 +1,17 @@
 from sys import stdin
 
 
-def bin_val_after_decimal(bin):
+def binn_val_after_decimal(binn):
     j=0
-    for i in range(len(bin)):
-        if(bin[i]=='.'):
+    for i in range(len(binn)):
+        if(binn[i]=='.'):
             j=i
             break
-    bin=int(bin)
+
     sum=0
-    for i in range(j,len(bin)):
-        if(bin[i]==1):
-            sum+=1/(2**(i+1-j))
+    for i in range(j,len(binn)):
+        if(binn[i]=='1'):
+            sum+=1/(2**(i-j))
     return sum
 def bin_val_before_decimal(bin):
     j=0
@@ -22,19 +22,20 @@ def bin_val_before_decimal(bin):
     dec=int(bin[0:i],2)
     return dec
 def last_one(ieee):
+    ret=0
     for i in range(3,8):
-        if(ieee[i]==1):
+        if(ieee[i]=='1'):
             ret=i
     return ret
 def ieee_to_decimal(ieee):
     exp=ieee[:3]
     mantissa=ieee[3:last_one(ieee)+1]
     exponent=int(exp,2)
-    binary='1'+mantissa
-    int_binary=int(binary)
-    final_bin=int_binary/10^(len(binary)-1-exponent)
+    binnary='1'+mantissa
+    int_binnary=int(binnary)
+    final_binn=int_binnary/10**(len(binnary)-1-exponent)
 
-    decimal=bin_val_after_decimal(str(final_bin))+bin_val_before_decimal(str(final_bin))
+    decimal=binn_val_after_decimal(str(final_binn))+binn_val_before_decimal(str(final_binn))
     return decimal
 
 def f_addition(List):
