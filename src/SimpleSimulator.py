@@ -295,3 +295,4 @@ def operatorCall(List,pc):
 # while (line!="hlt"):#hlt opcode
 #     PC+=1
 #     InsStack.append(line)
+print(f"{5}",)
