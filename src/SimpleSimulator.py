@@ -1,7 +1,5 @@
 from sys import stdin
-from uuid import RFC_4122
-
-
+    
 def MemDump():
     for i in MemStack:
         print(i)
