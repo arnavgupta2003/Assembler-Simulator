@@ -110,6 +110,7 @@ def Divide(List):
 
 def Move_Immediate(List):
     imm=List[8:]
+    imm=imm.zfill(16)
     r1=List[5:8]
     update_reg(r1,imm)
 
@@ -221,65 +222,65 @@ def Halt(List):
     halt=1
 
 def operatorCall(List,pc):
-    if (List[pc][:5] == "10000"):
-        Addition(List[pc])
+    if (List[:5] == "10000"):
+        Addition(List)
 
-    elif (List[pc][:5] == "10001"):
-        Subtraction(List[pc])
+    elif (List[:5] == "10001"):
+        Subtraction(List)
 
-    elif (List[pc][:5] == "10010"):
-        Move_Immediate(List[pc])
+    elif (List[:5] == "10010"):
+        Move_Immediate(List)
 
-    elif (List[pc][:5] == "10011"):
-        Move_Register(List[pc])
+    elif (List[:5] == "10011"):
+        Move_Register(List)
 
-    elif (List[pc][:5] == "10100"):
-        Load(List[pc])
+    elif (List[:5] == "10100"):
+        Load(List)
 
-    elif (List[pc][:5] == "10101"):
-        Store(List[pc])
+    elif (List[:5] == "10101"):
+        Store(List)
 
-    elif (List[pc][:5] == "10110"):
-        Multiply(List[pc])
+    elif (List[:5] == "10110"):
+        Multiply(List)
 
-    elif (List[pc][:5] == "10111"):
-        Divide(List[pc])
+    elif (List[:5] == "10111"):
+        Divide(List)
 
-    elif (List[pc][:5] == "11000"):
-        Right_Shift(List[pc])
+    elif (List[:5] == "11000"):
+        Right_Shift(List)
 
-    elif (List[pc][:5] == "11001"):
-        Left_Shift(List[pc])
+    elif (List[:5] == "11001"):
+        Left_Shift(List)
 
-    elif (List[pc][:5] == "11010"):
-        Exclusive_OR(List[pc])
+    elif (List[:5] == "11010"):
+        Exclusive_OR(List)
 
-    elif (List[pc][:5] == "11011"):
-        Or(List[pc])
+    elif (List[:5] == "11011"):
+        Or(List)
 
-    elif (List[pc][:5] == "11100"):
-        And(List[pc])
+    elif (List[:5] == "11100"):
+        And(List)
 
-    elif (List[pc][:5] == "11101"):
-        Invert(List[pc])
+    elif (List[:5] == "11101"):
+        Invert(List)
 
-    elif (List[pc][:5] == "11110"):
-        Compare(List[pc])
+    elif (List[:5] == "11110"):
+        Compare(List)
 
-    elif (List[pc][:5] == "11111"):
-        Unconditional_Jump(List[pc])
+    elif (List[:5] == "11111"):
+        Unconditional_Jump(List)
 
-    elif (List[pc][:5] == "01100"):
-        Jump_If_Less_Than(List[pc])
+    elif (List[:5] == "01100"):
+        Jump_If_Less_Than(List)
 
-    elif (List[pc][:5] == "01101"):
-        Jump_If_Greater_Than(List[pc])
+    elif (List[:5] == "01101"):
+        Jump_If_Greater_Than(List)
 
-    elif (List[pc][:5] == "01111"):
-        Jump_If_Equal(List[pc])
+    elif (List[:5] == "01111"):
+        Jump_If_Equal(List)
 
-    elif (List[pc][:5] == "01010"):
-        Halt(List[pc])
+    elif (List[:5] == "01010"):
+        Halt(List)
 
 global pc,halt,MemStack
 halt=0
@@ -292,8 +293,14 @@ for line in stdin:
     opcode=line[0:4]
     MemStack[pc]=line
     operatorCall(line,pc)
-    print(bin(pc)[2:])
+    pc_val=bin(pc)[2:]
+    pc_val=pc_val.zfill(8)
+    print(pc_val,end=' ')
     print(*RegStack)
     pc+=1
+    if(halt==1):
+        break
 
 print('\n'.join(MemStack))
+
+
