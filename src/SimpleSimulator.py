@@ -1,4 +1,5 @@
 from sys import stdin
+import matplotlib.pyplot as plt
 
 def MemDump():
     for i in MemStack:
@@ -130,14 +131,22 @@ def Move_Register(List):
     pc+=1
 
 def Load(List):
-    global MemStack,pc
+    global MemStack,pc,cycle,x_axis_cycle,y_axis_mem
+    cycle+=1
+    x_axis_cycle.append(cycle)
+    y_axis_mem.append(pc)
+
     mem=List[8:]
     memadd=int(mem,2)
     update_reg(List[5:8],MemStack[memadd])
     pc+=1
 
 def Store(List):
-    global MemStack,pc
+    global MemStack,pc,cycle,x_axis_cycle,y_axis_mem
+    cycle+=1
+    x_axis_cycle.append(cycle)
+    y_axis_mem.append(pc)
+
     r1=return_reg(List[5:8])
     mem=List[8:]
     memadd=int(mem,2)
@@ -321,25 +330,42 @@ global pc,halt,MemStack
 halt=0
 pc=0
 cycle=0
+x_axis_cycle=[]
+y_axis_mem=[]
 RegStack=["0000000000000000"]*8
 MemStack=["0000000000000000"]*256
 lines=[]
+
+i=0
 for line in stdin:
     line=line[:-1]
     lines.append(line)
+    MemStack[i]=line
+    i+=1
+
 
 
 while (True):
-    MemStack[pc]=line
+    cycle+=1
+    x_axis_cycle.append(cycle)
+    y_axis_mem.append(pc)
     pc_val=bin(pc)[2:]
     pc_val=pc_val.zfill(8)
-    operatorCall(line,pc)
+    operatorCall(MemStack[pc],pc)
     print(pc_val,end=' ')
     print(*RegStack)
-    cycle+=1
+    
+
     if(halt==1):
         break
 
+
+
 print('\n'.join(MemStack))
+
+plt.scatter(x_axis_cycle,y_axis_mem,c='red')
+plt.xlabel("cycles")
+plt.ylabel("memory access")
+plt.show()
 
 
