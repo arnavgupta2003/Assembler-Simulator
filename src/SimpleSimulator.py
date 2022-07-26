@@ -31,7 +31,7 @@ def binmul(a,b):
     return mul
 
 def bindiv(a,b):
-    div = bin(int(a, 2) / int(b, 2))
+    div = bin(int(a, 2) // int(b, 2))
     div=div[2:]
     div=div.zfill(16)
     return div
