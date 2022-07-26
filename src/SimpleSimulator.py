@@ -5,15 +5,17 @@ from uuid import RFC_4122
 global pc,halt
 halt=0
 pc=0
+RegStack=["0000000000000000"]*8
+VarStack=[]
 MemStack=["0000000000000000"]*256
 InsStack=[]
-# def __init__():
-#     for line in stdin:
-#         opcode=line[0:4]
-#         #handle in
-#         PC+=1
-#         InsStack.append(line)
-#         print(line)
+
+for line in stdin:
+    opcode=line[0:4]
+    #handle in
+    pc+=1
+    InsStack.append(line)
+    #print(line)
 
 
 def MemDump():
@@ -55,10 +57,12 @@ def bindiv(a,b):
     
 
 def return_reg(a):
-    pass
+    val=int(a,2)
+    return RegStack[val]
 
-def update_reg(a):
-    pass
+def update_reg(a,b):
+    val=int(a,2)
+    RegStack[val]=b;
 
 def Addition(List):
     r1=return_reg(List[7:10])
