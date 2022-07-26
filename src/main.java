@@ -228,7 +228,7 @@ public class main {
 	                	}
 	                	
 	                	
-	                	bin_val=(String.format("%03d",Integer.parseInt(bin_val)));
+	                	String Proj_bin_val=(String.format("%03d",Integer.parseInt(bin_val)));
 	                	
 	                	String mantissa="";
 	                	String exp="";
@@ -237,21 +237,23 @@ public class main {
 	                	String bin_dec="";
 	                	float temp=Imm_val_Float-int_val;
 	                	
+	           
 	                	for(int o=0;o<5;o++) {
 	                		temp*=2;
 	                		if(temp>=1) {
 	                			bin_dec+="1";
 	                			temp-=1;
-	                		}else if(temp==0) {
+	                		}else if(temp==(float)0) {
 	                			break;
 	                		}else {
 	                			bin_dec+="0";
 	                		}
 	                	}
-	                	String term=bin_val+bin_dec;
-	                	mantissa=term.substring(1, term.length());
+	                	String term=Proj_bin_val+bin_dec;
+	                	int idx_1=term.indexOf("1");
+	                	mantissa=term.substring(idx_1+1, term.length());
 //	                	mantissa=String.format("%5d", Integer.parseInt(mantissa));
-	                	for(int o=0;o<5-mantissa.length();o++) {
+	                	for(int o=0;o<6-mantissa.length();o++) {
 	                		mantissa+="0";
 	                	}
 	                	
@@ -259,10 +261,11 @@ public class main {
 	                	exp=String.format("%03d", Integer.parseInt(exp));
 	                	
 	                	
+	                	
 		                if(temp!=0) {
 		                	genError("flt_overflow",line_counter);
 		                }else {
-		                	System.out.println(bin_val+" "+bin_dec);
+		                	//System.out.println(Proj_bin_val+" "+bin_dec);
 		                	System.out.println(exp+" "+mantissa);
 		                	
 		                	Imm=String.format("%08d", Integer.parseInt(exp+mantissa));//Convert to 8 bit
