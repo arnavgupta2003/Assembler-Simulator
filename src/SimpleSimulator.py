@@ -1,5 +1,63 @@
 from sys import stdin
 
+
+def bin_val_after_decimal(bin):
+    j=0
+    for i in range(len(bin)):
+        if(bin[i]=='.'):
+            j=i
+            break
+    bin=int(bin)
+    sum=0
+    for i in range(j,len(bin)):
+        if(bin[i]==1):
+            sum+=1/(2^(i+1))
+    return sum
+def bin_val_before_decimal(bin):
+    j=0
+    for i in range(len(bin)):
+        if(bin[i]=='.'):
+            j=i
+    bin = int(bin)
+    dec=int(bin[0:i],2)
+    return dec
+def last_one(ieee):
+    for i in range(3,8):
+        if(ieee[i]==1):
+            ret=i
+    return ret
+def ieee_to_decimal(ieee):
+    exp=ieee[:3]
+    mantissa=ieee[3:last_one(ieee)+1]
+    exponent=int(exp,2)
+    binary='1'+mantissa
+    int_binary=int(binary)
+    final_bin=int_binary/10^(len(binary)-1-exponent)
+    # decimal=int(final_bin,2)
+    decimal=bin_val_after_decimal(str(final_bin))+bin_val_before_decimal(str(final_bin))
+    return decimal
+
+def f_addition(n1,n2,r3):
+    val=ieee_to_decimal(n1)+ieee_to_decimal(n2)
+    update_reg(r3, val)
+    pc += 1
+
+
+def f_subtraction(n1,n2,r3):
+    val=ieee_to_decimal(n1)-ieee_to_decimal(n2)
+    update_reg(r3,val)
+    pc+=1
+def moveF_immediate(imm,r1):
+    update_reg(r1, imm)
+    pc += 1
+
+
+
+
+
+
+
+
 def MemDump():
     for i in MemStack:
         print(i)
@@ -9,6 +67,8 @@ def binadd(a,b):
     summ=summ[2:]
     summ=summ.zfill(16)
     return summ
+
+
 
 def binsub(a,b):
     diff = bin(int(a, 2) - int(b, 2))
