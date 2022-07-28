@@ -22,11 +22,12 @@ public class main {
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
 		
-		
+		int ins_cnt=0;//for ins not >256
 		int line_counter=1;
 		int program_counter=0;
 		boolean Notvar=false;
 		int hlt_count=0;
+		int hlt_at=0;//for hlt at end
 		
 		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
         ArrayList<String> instructions = new ArrayList<String>();
@@ -38,12 +39,15 @@ public class main {
 			String line = sc.nextLine().strip();
 			String[] in = line.split(" ");
 			
+			
+			ins_cnt++;
 			//Handling Extra Space error
 			boolean isBlankAvailable = false;
 			for(String h:in) {
 				if(h.isBlank()||h.isEmpty()||h.equals(" ")) {
 					genError("Faulty_spaces",line_counter);
 					isBlankAvailable=true;
+					ins_cnt--;
 					break;
 				}
 			}
@@ -115,6 +119,7 @@ public class main {
             	isInstruct=true;
                 Notvar=true;
                 hlt_count++;
+                hlt_at=ins_cnt;
             }
             else {
 				isInstruct = true;
@@ -141,6 +146,10 @@ public class main {
 		
 		if(hlt_count==0) {
 			genError("hlt_missing", line_counter);
+		}else if(hlt_at!=ins_cnt) {
+			genError("hlt_not_at_end",line_counter);
+		}else if(ins_cnt>=256) {
+			genError("mem_exceed",line_counter);
 		}
 
 		for(int insCount=0;insCount<instructions.size();insCount++) {
@@ -152,8 +161,11 @@ public class main {
                 continue;
             }
             
+            
+            
             //Try Block
 			try {
+			
 				
 	            String in[] = line.split(" ");
 				
@@ -165,6 +177,7 @@ public class main {
 				String instructionType = returnType(OPCode);
 				
 				//#Check for bit errors 
+				
 				
 				//Setters
 				if (instructionType.equals("A")){
@@ -196,18 +209,80 @@ public class main {
 	                    continue;
 	                }
 	                //	Imm Handle
-	                String Imm; 
+	                String Imm="";
 	                String Imm_val_String = in[2].substring(1, in[2].length());//Took decimal Input
-	                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
 	                
-	                if(Imm_val_Integer>255 || Imm_val_Integer<0){
-	                    genError("immediateVal", cnt);
-	                    continue;
+	                
+	                
+	                if(in[0].equals("movf")){//For flt
+	                	
+	                	float Imm_val_Float = Float.parseFloat(Imm_val_String);//Converted to Float
+	                	String val[]=Imm_val_String.split("\\.");
+	                	int int_val=Integer.parseInt(val[0]);//first dec bit
+	                	
+	                	
+	                	String bin_val=Integer.toBinaryString(int_val);
+	                	
+	                	if(bin_val.length()>3) {
+	                		genError("flt_overflow",line_counter);
+	                	}
+	                	
+	                	
+	                	String Proj_bin_val=(String.format("%03d",Integer.parseInt(bin_val)));
+	                	
+	                	String mantissa="";
+	                	String exp="";
+	                	
+	                	int dec_val=Integer.parseInt(val[1]);
+	                	String bin_dec="";
+	                	float temp=Imm_val_Float-int_val;
+	                	
+	           
+	                	for(int o=0;o<5;o++) {
+	                		temp*=2;
+	                		if(temp>=1) {
+	                			bin_dec+="1";
+	                			temp-=1;
+	                		}else if(temp==(float)0) {
+	                			break;
+	                		}else {
+	                			bin_dec+="0";
+	                		}
+	                	}
+	                	String term=Proj_bin_val+bin_dec;
+	                	int idx_1=term.indexOf("1");
+	                	mantissa=term.substring(idx_1+1, term.length());
+//	                	mantissa=String.format("%5d", Integer.parseInt(mantissa));
+	                	for(int o=0;o<6-mantissa.length();o++) {
+	                		mantissa+="0";
+	                	}
+	                	
+	                	exp=Integer.toBinaryString(bin_val.length()-1);
+	                	exp=String.format("%03d", Integer.parseInt(exp));
+	                	
+	                	
+	                	
+		                if(temp!=0) {
+		                	genError("flt_overflow",line_counter);
+		                }else {
+		                	//System.out.println(Proj_bin_val+" "+bin_dec);
+		                	System.out.println(exp+" "+mantissa);
+		                	
+		                	Imm=String.format("%08d", Integer.parseInt(exp+mantissa));//Convert to 8 bit
+		                }
+	                }else {//For rest
+	                	int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
+		                
+		                if(Imm_val_Integer>255 || Imm_val_Integer<0){
+		                    genError("immediateVal", cnt);
+		                    continue;
+		                }
+		               
+		                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
+		                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
 	                }
 	                
-	                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
-	                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
-	                
+	            
 	                
 	                //Function Out
 	                finalBinary.add(OPCode+reg1+Imm);
@@ -376,6 +451,9 @@ public class main {
 	        	String error_line=String.format("Error @~%d: hlt statement missing ", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt statement missing in line $program_counter");
+	        }else if(Type.equals("mem_exceed")){
+	        	String error_line=String.format("Error @~%d: Memory Limit exceeded ", program_counter);
+	            error_list.add(error_line);
 	        }
 	        else if(Type.equals("hlt_not_at_end")){
 	        	String error_line=String.format("Error @~%d: hlt not used at the end ", program_counter);
@@ -384,6 +462,10 @@ public class main {
 	        }
 			else if(Type.equals("Faulty_spaces")){
 	        	String error_line=String.format("Error @~%d: Faulty number of spaces used", program_counter);
+	            error_list.add(error_line);
+	            // println("Error: hlt not used at the end in line $program_counter");
+	        }else if(Type.equals("flt_overflow")){
+	        	String error_line=String.format("Error @~%d: Float overflown", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt not used at the end in line $program_counter");
 	        }
@@ -409,8 +491,8 @@ public class main {
 	}
 
     public static String returnType(String OPCode){
-        String [] Atype={"10000","10001","10110","11010","11011","11100"};
-        String [] Btype={"10010","11001","11000"};
+        String [] Atype={"10000","10001","10110","11010","11011","11100","00000","00001"};
+        String [] Btype={"10010","11001","11000","00010"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
@@ -482,7 +564,15 @@ public class main {
                         return "10010";       
                     case 'R':
                         return "10011";    
-                };     
+                };  
+                
+           //FLT 
+            case "addf":
+            	return "00000";
+            case "subf":
+            	return "00001";
+            case "movf":
+            	return "00010";
 
         }
             genError("Typo", cnt);
