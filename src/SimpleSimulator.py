@@ -14,7 +14,7 @@ def binn_val_after_decimal(binn):
         if(binn[i]=='1'):
             sum+=1/(2**(i-j))
     return sum
-def bin_val_before_decimal(bin):
+def binn_val_before_decimal(bin):
     j=0
     for i in range(len(bin)):
         if(bin[i]=='.'):
