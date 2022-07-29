@@ -344,24 +344,27 @@ for line in stdin:
     i+=1
 
 
-
-while (True):
-    cycle+=1
-    x_axis_cycle.append(cycle)
-    y_axis_mem.append(pc)
-    pc_val=bin(pc)[2:]
-    pc_val=pc_val.zfill(8)
-    operatorCall(MemStack[pc],pc)
-    print(pc_val,end=' ')
-    print(*RegStack)
-    
-
-    if(halt==1):
-        break
+with open("out.txt",'w') as f:
+    while (True):
+        cycle+=1
+        x_axis_cycle.append(cycle)
+        y_axis_mem.append(pc)
+        pc_val=bin(pc)[2:]
+        pc_val=pc_val.zfill(8)
+        operatorCall(MemStack[pc],pc)
+        print(pc_val,end=' ')
+        print(*RegStack)
+        f.write(pc_val+' ')
+        f.write(' '.join(RegStack)+'\n')
 
 
+        if(halt==1):
+            break
 
-print('\n'.join(MemStack))
+
+
+    print('\n'.join(MemStack))
+    f.write('\n'.join(MemStack))
 
 plt.scatter(x_axis_cycle,y_axis_mem,c='red')
 plt.xlabel("cycles")
