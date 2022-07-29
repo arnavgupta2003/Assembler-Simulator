@@ -1,6 +1,86 @@
 from sys import stdin
 import matplotlib.pyplot as plt
 
+
+def binn_val_after_decimal(binn):
+    j=0
+    for i in range(len(binn)):
+        if(binn[i]=='.'):
+            j=i
+            break
+
+    sum=0
+    for i in range(j,len(binn)):
+        if(binn[i]=='1'):
+            sum+=1/(2**(i-j))
+    return sum
+def bin_val_before_decimal(bin):
+    j=0
+    for i in range(len(bin)):
+        if(bin[i]=='.'):
+            j=i
+    bin = int(bin)
+    dec=int(bin[0:i],2)
+    return dec
+def last_one(ieee):
+    ret=0
+    for i in range(3,8):
+        if(ieee[i]=='1'):
+            ret=i
+    return ret
+def ieee_to_decimal(ieee):
+    exp=ieee[:3]
+    mantissa=ieee[3:last_one(ieee)+1]
+    exponent=int(exp,2)
+    binnary='1'+mantissa
+    int_binnary=int(binnary)
+    final_binn=int_binnary/10**(len(binnary)-1-exponent)
+
+    decimal=binn_val_after_decimal(str(final_binn))+binn_val_before_decimal(str(final_binn))
+    return decimal
+
+def f_addition(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+
+    r3=List[13:]
+
+    val=ieee_to_decimal(r1)+ieee_to_decimal(r2)
+
+    # make val binary
+
+    update_reg(r3, val)
+    pc += 1
+
+
+def f_subtraction(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+
+    r3=List[13:]
+    # make val binary
+    val=ieee_to_decimal(r1)-ieee_to_decimal(r2)
+    update_reg(r3,val)
+    pc+=1
+def moveF_immediate(List):
+    global pc
+    imm = List[8:]
+    # imm = imm.zfill(16)
+    r1 = List[5:8]
+    update_reg(r1, imm)
+    pc += 1
+
+
+
+
+
+
+
+
 def MemDump():
     for i in MemStack:
         print(i)
@@ -10,6 +90,8 @@ def binadd(a,b):
     summ=summ[2:]
     summ=summ.zfill(16)
     return summ
+
+
 
 def binsub(a,b):
     diff = bin(int(a, 2) - int(b, 2))
