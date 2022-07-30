@@ -22,12 +22,12 @@ public class main {
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
 		
-		
+		int ins_cnt=0;//for ins not >256
 		int line_counter=1;
 		int program_counter=0;
 		boolean Notvar=false;
 		int hlt_count=0;
-		
+		int hlt_at=0;//for hlt at end
 		HashMap <String,Integer> Labels = new HashMap <String,Integer>();
         ArrayList<String> instructions = new ArrayList<String>();
         HashMap<String,Integer> variables = new HashMap<String,Integer>();
@@ -141,6 +141,10 @@ public class main {
 		
 		if(hlt_count==0) {
 			genError("hlt_missing", line_counter);
+		}else if(hlt_at!=ins_cnt) {
+			genError("hlt_not_at_end",line_counter);
+		}else if(ins_cnt>=256) {
+			genError("mem_exceed",line_counter);
 		}
 
 		for(int insCount=0;insCount<instructions.size();insCount++) {
@@ -196,18 +200,23 @@ public class main {
 	                    continue;
 	                }
 	                //	Imm Handle
-	                String Imm; 
+	                String Imm="";
 	                String Imm_val_String = in[2].substring(1, in[2].length());//Took decimal Input
-	                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
 	                
-	                if(Imm_val_Integer>255 || Imm_val_Integer<0){
-	                    genError("immediateVal", cnt);
-	                    continue;
-	                }
-	                
-	                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
-	                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
-	                
+	                //Movf func handle
+	                if(in[0].equals("movf")) {
+	                	Imm=dec_to_ieee(Imm_val_String,line_counter);
+	                }else {
+		                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
+		                
+		                if(Imm_val_Integer>255 || Imm_val_Integer<0){
+		                    genError("immediateVal", cnt);
+		                    continue;
+		                }
+		                
+		                String Imm_val_Binary = Integer.toBinaryString(Imm_val_Integer);//convert to bin 
+		                Imm=String.format("%08d", Integer.parseInt(Imm_val_Binary));//convert to 8bit
+	                }    
 	                
 	                //Function Out
 	                finalBinary.add(OPCode+reg1+Imm);
@@ -307,6 +316,7 @@ public class main {
 			}
 		}
 		
+		
 		//STDOut
 		if(error_list.size()!=0) {
 			for(String h:error_list) {
@@ -386,12 +396,70 @@ public class main {
 	        	String error_line=String.format("Error @~%d: Faulty number of spaces used", program_counter);
 	            error_list.add(error_line);
 	            // println("Error: hlt not used at the end in line $program_counter");
-	        }
-            else{
+	        }else if(Type.equals("flt_overflow")){
+	        	String error_line=String.format("Error @~%d: Float overflown", program_counter);
+	            error_list.add(error_line);
+	            // println("Error: hlt not used at the end in line $program_counter");
+	        }else{
                 String error_line=String.format("Error @~%d: General Syntax error", program_counter);
 	            error_list.add(error_line);
             }
 	    } 
+	 
+	//MISC Functions
+	 
+	 public static String dec_to_ieee(String val,int line_counter) {
+		 //One to one var convert from py to java
+		 String a[] = val.split("\\.");
+		 String nondeci=Integer.toBinaryString(Integer.parseInt(a[0]));//why from idx 2 to end??
+		 //nondeci=nondeci.substring(2,nondeci.length());//why from idx 2 to end??
+		 int remaining = nondeci.length();
+		 String deci=a[1];
+		 int decilen = deci.length();
+		 float decim=(float) (Integer.parseInt(a[1])/(Math.pow(10, decilen)));
+		 String afterdeci="";
+		 int cnt=0;
+		 int flag=0;
+		 if(Float.parseFloat(val)<1)
+			 flag=1;
+		 while(true) {
+			 if(cnt>(8-remaining)) {
+				 flag=1;
+				 break;
+			 }
+			 if(decim==0) {
+				 break;
+			 }
+			 decim*=2;
+			 cnt++;
+			 if(decim>=1) {
+				 decim-=1;
+				 afterdeci+="1";
+			 }else if(decim<1) {
+				 afterdeci+="0";
+			 }
+		 }
+		 
+		 
+		 String expo = Integer.toBinaryString(remaining-1);
+		 //expo=expo.substring(2, expo.length());//Why idx 2 to end??
+		 expo=String.format("%03d", Integer.parseInt(expo));
+		 String mantissa=nondeci.substring(1,nondeci.length())+afterdeci;
+		 
+		 for(int j=0;j<(5-mantissa.length());j++) {
+			 mantissa+="0";
+		 }
+		 String Binary = expo+mantissa;
+		 Binary=String.format("%08d", Integer.parseInt(Binary));
+		 
+		 //System.out.println("DEB:"+Binary);//DEB
+		 if(flag>0) {
+			 genError("flt_overflow", line_counter);//gen err
+		 }else {
+			 return Binary;
+		 }
+		 return "";
+	 }
 	public static boolean checkFlag(String regs){
 	     if (regs=="111"){
 	         return true;
@@ -409,12 +477,13 @@ public class main {
 	}
 
     public static String returnType(String OPCode){
-        String [] Atype={"10000","10001","10110","11010","11011","11100"};
-        String [] Btype={"10010","11001","11000"};
+    	String [] Atype={"10000","10001","10110","11010","11011","11100","00000","00001"};
+        String [] Btype={"10010","11001","11000","00010"};
         String [] Ctype ={"10011","10111","11101","11110"};
         String [] Dtype={"10100","10101"};
         String [] Etype={"11111","01100","01101","01111"};
         String [] Ftype ={"01010"};
+        
         if(Arrays.asList(Atype).contains(OPCode)){
             return "A";
         }
@@ -482,12 +551,20 @@ public class main {
                         return "10010";       
                     case 'R':
                         return "10011";    
-                };     
+                };   
+              //FLT 
+            case "addf":
+            	return "00000";
+            case "subf":
+            	return "00001";
+            case "movf":
+            	return "00010";    
 
         }
             genError("Typo", cnt);
             return "_";
-			
+		
+            
             
     }
 	
