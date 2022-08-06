@@ -3,9 +3,8 @@ from sys import stdin
 from turtle import up
 import matplotlib.pyplot as plt
 
-
 def decimaltoieee(deci):
-    
+    num=0
     a=deci.split('.')
     nondeci=bin(int(a[0]))[2:]
     remaining=len(nondeci)
@@ -17,9 +16,12 @@ def decimaltoieee(deci):
     flag=0
     if(float(deci)<1):
         flag=1
+    elif(float(deci)>=252):
+        num=1
+    
     while(True):
         
-        if(count>(8-remaining)):
+        if(count>(5-remaining)):
             flag=1
             break
         if(decim==0):
@@ -39,8 +41,10 @@ def decimaltoieee(deci):
     mantisa=nondeci[1:]+afterdeci
     mantisa=mantisa+'0'*(5-len(mantisa))
     binary=expo+mantisa
-    if(flag>0):
+    if num>0:
         return "number overflow"
+    elif(flag>0):
+        return "float overflow"
     else:
         return binary
 
@@ -141,11 +145,14 @@ def Addition(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -165,11 +172,14 @@ def Subtraction(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -189,11 +199,14 @@ def Multiply(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -396,14 +409,17 @@ def f_addition(List):
     val=str(float(ieee_to_decimal(r1)+ieee_to_decimal(r2)))
 
     newval=decimaltoieee(val)
-    newval=newval.zfill(16)
-
-    if(newval=='number overflow'):
+    
+    if(newval=='float overflow'):
         update_reg(r3,'0'*16)
         update_reg('111','0000000000001000')
-    
-    update_reg(r3, newval)
-    resetflag()
+    elif(newval=='number overflow'):
+        update_reg(r3,'0'*8+'1'*8)
+        update_reg('111','0000000000001000')
+    else:
+        newval=newval.zfill(16)
+        update_reg(r3, newval)
+        resetflag()
     pc += 1
 
 def f_subtraction(List):
@@ -418,22 +434,25 @@ def f_subtraction(List):
     r3=List[13:]
 
     val=(float(ieee_to_decimal(r1)-ieee_to_decimal(r2)))
-    if (val<0):
+    if (val<1):
         update_reg(r3,'0'*16)
         update_reg('111','0000000000001000')
     
     val=str(val)
     newval=decimaltoieee(val)
     
-    if(newval=='number overflow'):
+    if(newval=='float overflow'):
         update_reg(r3,'0'*16)
         update_reg('111','0000000000001000')
-    
-    newval=newval.zfill(16)
-    update_reg(r3, newval)
-    update_reg(r3,val)
+    elif(newval=='number overflow'):
+        update_reg(r3,'0'*8+'1'*8)
+        update_reg('111','0000000000001000')
+    else:
+        newval=newval.zfill(16)
+        update_reg(r3, newval)
+        resetflag()
+
     pc+=1
-    resetflag()
 
 def moveF_immediate(List):
     global pc

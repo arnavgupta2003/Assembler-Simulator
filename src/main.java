@@ -208,7 +208,7 @@ public class main {
 	                
 	                //Movf func handle
 	                if(in[0].equals("movf")) {
-	                	Imm=dec_to_ieee(Imm_val_String,line_counter);
+	                	Imm=dec_to_ieee(Imm_val_String,cnt);
 	                }else {
 		                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
 		                
@@ -411,7 +411,7 @@ public class main {
 		 String a[] = val.split("\\.");
 		 String nondeci=Integer.toBinaryString(Integer.parseInt(a[0]));//why from idx 2 to end??
 		 //nondeci=nondeci.substring(2,nondeci.length());//why from idx 2 to end??
-		 int remaining = nondeci.length();
+		 int remaining = nondeci.length()-1;
 		 String deci=a[1];
 		 int decilen = deci.length();
 		 float decim=(float) (Integer.parseInt(a[1])/(Math.pow(10, decilen)));
@@ -421,7 +421,7 @@ public class main {
 		 if(Float.parseFloat(val)<1)
 			 flag=1;
 		 while(true) {
-			 if(cnt>(8-remaining)) {
+			 if(cnt>(5-remaining)) {
 				 flag=1;
 				 break;
 			 }
@@ -439,12 +439,12 @@ public class main {
 		 }
 		 
 		 
-		 String expo = Integer.toBinaryString(remaining-1);
+		 String expo = Integer.toBinaryString(remaining);
 		 //expo=expo.substring(2, expo.length());//Why idx 2 to end??
 		 expo=String.format("%03d", Integer.parseInt(expo));
 		 String mantissa=nondeci.substring(1,nondeci.length())+afterdeci;
-		 
-		 for(int j=0;j<(5-mantissa.length());j++) {
+		 int extrazero=(5-mantissa.length());
+		 for(int j=0;j<extrazero;j++) {
 			 mantissa+="0";
 		 }
 		 String Binary = expo+mantissa;
