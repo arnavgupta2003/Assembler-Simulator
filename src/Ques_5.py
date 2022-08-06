@@ -33,11 +33,24 @@ dic={   "b":0,
         "GNibble":22,
     }
 
+
+def word(word,a):
+    word=word.lower()
+    if(word=="word"):
+        return bincount(a)
+    elif(word=="kword"):
+        return bincount(a)+10
+    elif(word=="mword"):
+        return bincount(a)+20    
+    elif(word=="gword"):
+        return bincount(a)+30
+    else:
+        return False        
+        
 def bincount(num):
     a=0
-    while(num):
+    while(2**a<num):
         a+=1
-        num//=2
     return a
 
 def ques_1(memSpace,memType):       
@@ -58,15 +71,15 @@ def ques_1(memSpace,memType):
             continue
     l=memSpace[idx:]
     b=0
-    if l in ['word',"Word"]:
-        b=cpu
+    if word(l,cpu):
+        b=word(l,cpu)
     else:
         b=dic[l]
 
     totalmempin=bincount(inx)+b
 
-    if memType in ['word',"Word"]:
-        addinbits=cpu
+    if word(memType,cpu):
+        addinbits=word(memType,cpu)
     else:
         addinbits=dic[memType.lower()]
 
@@ -77,7 +90,7 @@ def ques_1(memSpace,memType):
     print(f"Number of bits needed by opcode {opcode_bits} \n")
     
     filler_bit=insLength-opcode_bits-2*regLength
-    print(f"Number of filler bits are: {filler_bit}")
+    print(f"Number of filler bits are: {filler_bit}\n")
 
     max_instruction=2**opcode_bits
     print(f"Maximum number of instructions this ISA can support is: {max_instruction} \n")
@@ -102,15 +115,15 @@ def ques_2(memSpace,memType):
             continue
     l=memSpace[idx:]
     b=0
-    if l in ['word',"Word"]:
-        b=cpu
+    if word(l,cpu):
+        b=word(l,cpu)
     else:
         b=dic[l]
 
     totalmempin=bincount(inx)+b
 
-    if memType in ['word',"Word"]:
-        addinbits=cpu
+    if word(memType,cpu):
+        addinbits=word(memType,cpu)
     else:
         addinbits=dic[memType.lower()]
     
@@ -122,10 +135,10 @@ def ques_2(memSpace,memType):
         changeTo=input("Change the type of CPU to(Bit,Byte,Nibble,word):")
 
         newmeminbits=0
-        if changeTo in ['word',"Word"]:
-            newmeminbits=cpuBits
+        if word(changeTo,cpu):
+            newmeminbits=word(changeTo,cpuBits)
         else:
-            newmeminbits=2**dic[changeTo.lower()]
+            newmeminbits=dic[changeTo.lower()]
 
         afterpins=totalmempin-newmeminbits
 
@@ -134,10 +147,10 @@ def ques_2(memSpace,memType):
     elif(quesType==2):
         cpuBits=cpu
         addPins=int(input("Address pins of CPU:"))
-        memType=input("Type of addressable memory(Bit/Byte/Nibble/word_add):")
+        memType=input("Type of addressable memory(Bit/Byte/Nibble/word):")
         meminbits=0
-        if memType in ['word',"Word"]:
-            meminbits=cpuBits
+        if word(memType,cpu):
+            meminbits=word(memType,cpu)
         else:
             meminbits=dic[memType.lower()]
         
