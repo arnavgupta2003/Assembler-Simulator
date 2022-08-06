@@ -1,10 +1,10 @@
+from re import L
 from sys import stdin
 from turtle import up
 import matplotlib.pyplot as plt
 
-
 def decimaltoieee(deci):
-    
+    num=0
     a=deci.split('.')
     nondeci=bin(int(a[0]))[2:]
     remaining=len(nondeci)
@@ -16,9 +16,12 @@ def decimaltoieee(deci):
     flag=0
     if(float(deci)<1):
         flag=1
+    elif(float(deci)>=252):
+        num=1
+    
     while(True):
         
-        if(count>(8-remaining)):
+        if(count>(5-remaining)):
             flag=1
             break
         if(decim==0):
@@ -38,8 +41,10 @@ def decimaltoieee(deci):
     mantisa=nondeci[1:]+afterdeci
     mantisa=mantisa+'0'*(5-len(mantisa))
     binary=expo+mantisa
-    if(flag>0):
+    if num>0:
         return "number overflow"
+    elif(flag>0):
+        return "float overflow"
     else:
         return binary
 
@@ -74,65 +79,6 @@ def ieee_to_decimal(ieee):
         after=''
     decimal=binn_val_after_decimal(after)+binn_val_before_decimal(before)
     return decimal
-
-def f_addition(List):
-
-    global pc
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-    r2=r2[8:]
-    r1=r1[8:]
-
-    r3=List[13:]
-
-    val=str(float(ieee_to_decimal(r1)+ieee_to_decimal(r2)))
-
-    newval=decimaltoieee(val)
-    newval=newval.zfill(16)
-
-    if(newval=='number overflow'):
-        update_reg(r3,'0'*16)
-        update_reg('111','0000000000001000')
-    
-    update_reg(r3, newval)
-    pc += 1
-
-
-def f_subtraction(List):
-
-    global pc
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-
-    r2=r2[8:]
-    r1=r1[8:]
-
-    r3=List[13:]
-
-    val=(float(ieee_to_decimal(r1)-ieee_to_decimal(r2)))
-    if (val<0):
-        update_reg(r3,'0'*16)
-        update_reg('111','0000000000001000')
-    
-    val=str(val)
-    newval=decimaltoieee(val)
-    
-    if(newval=='number overflow'):
-        update_reg(r3,'0'*16)
-        update_reg('111','0000000000001000')
-    
-    newval=newval.zfill(16)
-    update_reg(r3, newval)
-    update_reg(r3,val)
-    pc+=1
-
-def moveF_immediate(List):
-    global pc
-    imm = List[8:]
-    imm = imm.zfill(16)
-    r1 = List[5:8]
-    update_reg(r1, imm)
-    pc += 1
 
 
 def resetflag():
@@ -171,6 +117,12 @@ def bindiv(a,b):
     div=div.zfill(16)
     return div
 
+def binmod(a,b):
+    div = bin(int(a, 2) % int(b, 2))
+    div=div[2:]
+    div=div.zfill(16)
+    return div
+
 def return_reg(a):
     val=int(a,2)
     return RegStack[val]
@@ -193,11 +145,14 @@ def Addition(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -217,11 +172,14 @@ def Subtraction(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -241,11 +199,14 @@ def Multiply(List):
         newval='0'*16
         update_reg(r3,newval)
         return
-    elif(int(newval,2)>2**15):
+    elif(int(newval,2)>2**16-1):
         Flag='1000'
         Flag=Flag.zfill(16)
         update_reg('111',Flag)
-        newval=newval[len(newval)-16:]
+        n=int(newval,2)
+        n=n%(2**16)
+        newval=bin(n)[2:]
+        newval=newval.zfill(16)
         update_reg(r3,newval)
         return
     update_reg(r3,newval)
@@ -253,11 +214,12 @@ def Multiply(List):
 
 def Divide(List):
     global pc
-    r1=return_reg(List[7:10])
-    r2=return_reg(List[10:13])
-    newval=bindiv(r1,r2)
-    r3=List[13:]
-    update_reg(r3,newval)
+    r1=return_reg(List[10:13])
+    r2=return_reg(List[13:])
+    que=bindiv(r1,r2)
+    rem=binmod(r1,r2)
+    update_reg('000',que)
+    update_reg('001',rem)
     pc+=1
     resetflag()
 
@@ -322,7 +284,7 @@ def Left_Shift(List):
     if(imm>16):
         newval="0"*16
     else:
-        newval=r1[16-imm::]+"0"*imm
+        newval=r1[imm::]+"0"*imm
     update_reg(List[5:8],newval)
     pc+=1
     resetflag()
@@ -332,6 +294,7 @@ def Exclusive_OR(List):
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1^r2)[2:]
+    newval=newval.zfill(16)
     r3 = List[13:]
     update_reg(r3, newval)
     pc+=1
@@ -342,6 +305,7 @@ def Or(List):
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1 | r2)[2:]
+    newval=newval.zfill(16)
     r3 = List[13:]
     update_reg(r3, newval)
     pc+=1
@@ -352,6 +316,7 @@ def And(List):
     r1 = int(return_reg(List[7:10]),2)
     r2 = int(return_reg(List[10:13]),2)
     newval = bin(r1 & r2)[2:]
+    newval=newval.zfill(16)
     r3 = List[13:]
     update_reg(r3, newval)
     pc+=1
@@ -359,9 +324,8 @@ def And(List):
 
 def Invert(List):
     global pc
-    r1 = return_reg(List[10:13],2)
-
-    newval = bin(~r1)[2:]
+    r1 = return_reg(List[10:13])
+    newval=''.join(['1' if i=='0' else '0' for i in r1])
     r3 = List[13:]
     update_reg(r3, newval)
     pc+=1
@@ -403,6 +367,9 @@ def Jump_If_Less_Than(List):
     Flag=int(return_reg("111"),2)
     if(Flag==4):
         pc=int(List[8:],2)
+    else:
+        pc+=1
+    
     resetflag()
 
 def Jump_If_Greater_Than(List):
@@ -428,7 +395,77 @@ def Halt(List):
     pc+=1
     halt=1
     resetflag()
+
+def f_addition(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+    r2=r2[8:]
+    r1=r1[8:]
+
+    r3=List[13:]
+
+    val=str(float(ieee_to_decimal(r1)+ieee_to_decimal(r2)))
+
+    newval=decimaltoieee(val)
     
+    if(newval=='float overflow'):
+        update_reg(r3,'0'*16)
+        update_reg('111','0000000000001000')
+    elif(newval=='number overflow'):
+        update_reg(r3,'0'*8+'1'*8)
+        update_reg('111','0000000000001000')
+    else:
+        newval=newval.zfill(16)
+        update_reg(r3, newval)
+        resetflag()
+    pc += 1
+
+def f_subtraction(List):
+
+    global pc
+    r1=return_reg(List[7:10])
+    r2=return_reg(List[10:13])
+
+    r2=r2[8:]
+    r1=r1[8:]
+
+    r3=List[13:]
+
+    val=(float(ieee_to_decimal(r1)-ieee_to_decimal(r2)))
+    if (val<1):
+        update_reg(r3,'0'*16)
+        update_reg('111','0000000000001000')
+    
+    val=str(val)
+    newval=decimaltoieee(val)
+    
+    if(newval=='float overflow'):
+        update_reg(r3,'0'*16)
+        update_reg('111','0000000000001000')
+    elif(newval=='number overflow'):
+        update_reg(r3,'0'*8+'1'*8)
+        update_reg('111','0000000000001000')
+    else:
+        newval=newval.zfill(16)
+        update_reg(r3, newval)
+        resetflag()
+
+    pc+=1
+
+def moveF_immediate(List):
+    global pc
+    imm = List[8:]
+    imm = imm.zfill(16)
+    r1 = List[5:8]
+    update_reg(r1, imm)
+    pc += 1
+    resetflag()
+
+
+
+
 def operatorCall(List,pc):
     if (List[:5] == "10000"):
         Addition(List)
@@ -490,6 +527,15 @@ def operatorCall(List,pc):
     elif (List[:5] == "01010"):
         Halt(List)
 
+    elif (List[:5] == "00000"):
+        f_addition(List)
+
+    elif (List[:5] == "00001"):
+        f_subtraction(List)
+    elif (List[:5] == "00010"):
+        moveF_immediate(List)
+
+
 global pc,halt,MemStack
 halt=0
 pc=0
@@ -503,9 +549,18 @@ lines=[]
 i=0
 for line in stdin:
     line=line[:-1]
-    lines.append(line)
-    MemStack[i]=line
-    i+=1
+    if(len(line)!=16):
+        pass
+
+    else:
+        f=0
+        for j in line:
+            if(j!='0' and j!='1'):
+                f+=1
+        if(f==0):
+            lines.append(line)
+            MemStack[i]=line
+            i+=1
 
 
 with open("out.txt",'w') as f:

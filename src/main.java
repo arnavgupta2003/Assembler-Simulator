@@ -36,12 +36,12 @@ public class main {
         //Input Handle
 		while(sc.hasNextLine()) {//Taking input
 			String line = sc.nextLine().strip();
-			String[] in = line.split(" ");
+			String[] in = line.split("\\s+");
 			
 			//Handling Extra Space error
 			boolean isBlankAvailable = false;
 			for(String h:in) {
-				if(h.isBlank()||h.isEmpty()||h.equals(" ")) {
+				if(h.equals(" ")) {
 					genError("Faulty_spaces",line_counter);
 					isBlankAvailable=true;
 					break;
@@ -138,6 +138,7 @@ public class main {
 		sc.close();
 		
 		//Ans Computation Handle
+	
 		
 		if(hlt_count==0) {
 			genError("hlt_missing", line_counter);
@@ -145,6 +146,8 @@ public class main {
 			genError("hlt_not_at_end",line_counter);
 		}else if(ins_cnt>=256) {
 			genError("mem_exceed",line_counter);
+		}else if(hlt_count>1) {
+			genError("hlt_not_at_end",program_counter);
 		}
 
 		for(int insCount=0;insCount<instructions.size();insCount++) {
@@ -205,7 +208,7 @@ public class main {
 	                
 	                //Movf func handle
 	                if(in[0].equals("movf")) {
-	                	Imm=dec_to_ieee(Imm_val_String,line_counter);
+	                	Imm=dec_to_ieee(Imm_val_String,cnt);
 	                }else {
 		                int Imm_val_Integer = Integer.parseInt(Imm_val_String);//Converted to Integer
 		                
@@ -301,15 +304,10 @@ public class main {
 	                    }
 	                }
 	            }else if(instructionType.equals("F")){
-	            	
-	            	//Error handle
-	            	if(insCount+1!=program_counter){
-	                    genError("hlt_not_at_end", cnt);
-	                }
-	                else {            	
+	            	       	
 	            	//Function Out
 	                finalBinary.add(OPCode+"00000"+"00000"+"0");
-	                }
+	                
 	            }
 			}catch(Exception e) {
 				genError("Gen-Error", cnt);
@@ -413,7 +411,7 @@ public class main {
 		 String a[] = val.split("\\.");
 		 String nondeci=Integer.toBinaryString(Integer.parseInt(a[0]));//why from idx 2 to end??
 		 //nondeci=nondeci.substring(2,nondeci.length());//why from idx 2 to end??
-		 int remaining = nondeci.length();
+		 int remaining = nondeci.length()-1;
 		 String deci=a[1];
 		 int decilen = deci.length();
 		 float decim=(float) (Integer.parseInt(a[1])/(Math.pow(10, decilen)));
@@ -423,7 +421,7 @@ public class main {
 		 if(Float.parseFloat(val)<1)
 			 flag=1;
 		 while(true) {
-			 if(cnt>(8-remaining)) {
+			 if(cnt>(5-remaining)) {
 				 flag=1;
 				 break;
 			 }
@@ -441,12 +439,12 @@ public class main {
 		 }
 		 
 		 
-		 String expo = Integer.toBinaryString(remaining-1);
+		 String expo = Integer.toBinaryString(remaining);
 		 //expo=expo.substring(2, expo.length());//Why idx 2 to end??
 		 expo=String.format("%03d", Integer.parseInt(expo));
 		 String mantissa=nondeci.substring(1,nondeci.length())+afterdeci;
-		 
-		 for(int j=0;j<(5-mantissa.length());j++) {
+		 int extrazero=(5-mantissa.length());
+		 for(int j=0;j<extrazero;j++) {
 			 mantissa+="0";
 		 }
 		 String Binary = expo+mantissa;
