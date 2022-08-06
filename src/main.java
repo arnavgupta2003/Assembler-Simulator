@@ -147,7 +147,7 @@ public class main {
 		}else if(ins_cnt>=256) {
 			genError("mem_exceed",line_counter);
 		}else if(hlt_count>1) {
-			genError("hlt_not_at_end",hlt_at);
+			genError("hlt_not_at_end",program_counter);
 		}
 
 		for(int insCount=0;insCount<instructions.size();insCount++) {
