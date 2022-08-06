@@ -38,16 +38,17 @@ def bincount(num):
     while(num):
         a+=1
         num//=2
-    return a-1
+    return a
 
 def ques_1(memSpace,memType):       
     print("1. Type A: <Q bit opcode> <P-bit address> <N bit register>")
-    print("2. Type B: <Q bit opcode> <R bits filler> <N bit register> <N bit register>") 
-    isaType=int(input("Enter the index of the type of ISA(1/2):"))     
+    print("2. Type B: <Q bit opcode> <R bits filler> <N bit register> <N bit register>\n\n")    
     insLength=int(input("Length of one inst. in bits:"))
     regLength=int(input("Length of one reg. in bits:"))
     cpu=int(input("Enter the CPU size in bits:"))
-    meminbits=0
+    print()
+    print()
+    
     idx=0
     inx=0
     for i in memSpace:
@@ -60,48 +61,38 @@ def ques_1(memSpace,memType):
     if l in ['word',"Word"]:
         b=cpu
     else:
-        b=2**dic[l.lower()]
+        b=dic[l]
 
-    meminbits=inx*2**b         
+    totalmempin=bincount(inx)+b
 
     if memType in ['word',"Word"]:
-        meminbits=cpu
+        addinbits=cpu
     else:
-        meminbits=2**dic[memType.lower()]
+        addinbits=dic[memType.lower()]
 
-    if(isaType==1):
-        totalPins=bincount(memSpace/meminbits)
-        print(f"Minimum bits needed to represent an address in this architecture is: {totalPins}")
+    totalPins=totalmempin-addinbits
+    print(f"Minimum bits needed to represent an address in this architecture is: {totalPins} \n")
 
-        opcode_bits=insLength-regLength-totalPins
-        print(f"Number of bits needed by opcode {opcode_bits}")
-        
-        max_instruction=2**opcode_bits
-        print(f"Maximum number of instructions this ISA can support is: {max_instruction}")
-        
-        max_register=2**regLength
-        print(f"Maximum number of registers this ISA can support is: {max_register}")
-    else:
+    opcode_bits=insLength-regLength-totalPins
+    print(f"Number of bits needed by opcode {opcode_bits} \n")
+    
+    filler_bit=insLength-opcode_bits-2*regLength
+    print(f"Number of filler bits are: {filler_bit}")
 
-        totalPins=bincount(memSpace/meminbits)
-        print(f"Minimum bits needed to represent an address in this architecture is: {totalPins}")
+    max_instruction=2**opcode_bits
+    print(f"Maximum number of instructions this ISA can support is: {max_instruction} \n")
+    
+    max_register=2**regLength
+    print(f"Maximum number of registers this ISA can support is: {max_register}")
 
-        opcode_bits=insLength-regLength-totalPins-regLength
-        print(f"Number of bits needed by opcode {opcode_bits}")
 
-        filler_bit=insLength-opcode_bits-2*regLength
-        print(f"Number of filler bits are: {filler_bit}")
 
-        max_instruction=2**opcode_bits
-        print(f"Maximum number of instructions this ISA can support is: {max_instruction}")
-        
-        max_register=2**regLength
-        print(f"Maximum number of registers this ISA can support is: {max_register}")
+
 
 def ques_2(memSpace,memType):    
+
     quesType=int(input("Type of System Enhancement..(1/2) (0 to quit)?"))
     cpu=int(input("Enter the CPU size in bits:"))
-    meminbits=0
     idx=0
     inx=0
     for i in memSpace:
@@ -114,25 +105,19 @@ def ques_2(memSpace,memType):
     if l in ['word',"Word"]:
         b=cpu
     else:
-        b=2**dic[l.lower()]
+        b=dic[l]
 
-    meminbits=inx*2**b         
+    totalmempin=bincount(inx)+b
 
     if memType in ['word',"Word"]:
-        meminbits=cpu
+        addinbits=cpu
     else:
-        meminbits=2**dic[memType.lower()]
-
+        addinbits=dic[memType.lower()]
     
     if(quesType==1):   
         cpuBits=cpu
-        meminbits=0
-        if memType in ['word',"Word"]:
-            meminbits=cpuBits
-        else:
-            meminbits=2**dic[memType.lower()]
 
-        initPins=bincount(memSpace/meminbits)
+        initPins=totalmempin-addinbits
 
         changeTo=input("Change the type of CPU to(Bit,Byte,Nibble,word):")
 
@@ -142,7 +127,7 @@ def ques_2(memSpace,memType):
         else:
             newmeminbits=2**dic[changeTo.lower()]
 
-        afterpins=bincount(memSpace/newmeminbits)
+        afterpins=totalmempin-newmeminbits
 
         print("We need ",afterpins-initPins,"pins")
 
@@ -154,23 +139,22 @@ def ques_2(memSpace,memType):
         if memType in ['word',"Word"]:
             meminbits=cpuBits
         else:
-            meminbits=2**dic[memType.lower()]
+            meminbits=dic[memType.lower()]
         
-        totalmem=addPins*meminbits
+        expo=addPins+meminbits
         
-        expo=bincount(totalmem)
-
-        if (expo>30):
-            val=totalmem/(2**30)
-            print(val,"GigaBytes")
-        elif(expo>20):
-            val=totalmem/(2**20)
-            print(val,"MegaBytes")
-        elif(expo>10):
-            val=totalmem/(2**10)
-            print(val,"KiloBytes")
+        if (expo>33):
+            val=2**(expo-33)
+            print(val,"GigaBytes\n")
+        elif(expo>23):
+            val=2**(expo-23)
+            print(val,"MegaBytes\n")
+        elif(expo>13):
+            val=2**(expo-13)
+            print(val,"KiloBytes\n")
         else:
-            print(val,"Bytes")
+            2**(expo-3)
+            print(val,"Bytes\n")
     else:
         print("Bye..")    
 
