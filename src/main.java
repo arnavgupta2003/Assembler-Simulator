@@ -36,12 +36,12 @@ public class main {
         //Input Handle
 		while(sc.hasNextLine()) {//Taking input
 			String line = sc.nextLine().strip();
-			String[] in = line.split(" ");
+			String[] in = line.split("\\s+");
 			
 			//Handling Extra Space error
 			boolean isBlankAvailable = false;
 			for(String h:in) {
-				if(h.isBlank()||h.isEmpty()||h.equals(" ")) {
+				if(h.equals(" ")) {
 					genError("Faulty_spaces",line_counter);
 					isBlankAvailable=true;
 					break;
@@ -138,6 +138,7 @@ public class main {
 		sc.close();
 		
 		//Ans Computation Handle
+	
 		
 		if(hlt_count==0) {
 			genError("hlt_missing", line_counter);
@@ -145,6 +146,8 @@ public class main {
 			genError("hlt_not_at_end",line_counter);
 		}else if(ins_cnt>=256) {
 			genError("mem_exceed",line_counter);
+		}else if(hlt_count>1) {
+			genError("hlt_not_at_end",hlt_at);
 		}
 
 		for(int insCount=0;insCount<instructions.size();insCount++) {
@@ -301,15 +304,10 @@ public class main {
 	                    }
 	                }
 	            }else if(instructionType.equals("F")){
-	            	
-	            	//Error handle
-	            	if(insCount+1!=program_counter){
-	                    genError("hlt_not_at_end", cnt);
-	                }
-	                else {            	
+	            	       	
 	            	//Function Out
 	                finalBinary.add(OPCode+"00000"+"00000"+"0");
-	                }
+	                
 	            }
 			}catch(Exception e) {
 				genError("Gen-Error", cnt);
