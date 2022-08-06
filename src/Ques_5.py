@@ -69,12 +69,56 @@ def i_o():
     memType=input("Type of addressable memeory(Bit/Byte/Nibble/word_add):")
     print("Queries start")
     while(True):
+        quesFlag=int(input("Enter the question type:"))
+        if(quesFlag==1):
+            ques_1()
+        else:
+            ques_2() 
+
+
+
+
+    cont=input("Continue?(0/1)")
+    if(cont=="0"):
+        break
+
+ def ques_1():       
+    print("1. Type A: <Q bit opcode> <P-bit address> <7 bit register>")
+    print("2. Type B: <Q bit opcode> <R bits filler> <7 bit register> <7 bit register>")    
+    isaType=int(input("What is the ISA Type(1/2):"))       
+    insLength=int(input("Length of one inst. in bits:"))
+    regLength=int(input("Lenght of one reg. in bits:"))
+
+    if(isaType==1):
+        insBits=input("Length of one inst. in bits:")
+        regLength=input("length of register in bits:")
+
+        # def normal_query(instruction,register,space,addressed):
+        # # tpye-a
+        # i=0
+        # while(P_address!=1):
+        #     P_address=space/2**i
+        #     i+=1
+        # P_address=i
+        # print(f"minimum bits are needed to represent an address in this architecture is {P_address}")
+        # opcode_bits=instruction-register-P_address
+        # print(f"Number of bits needed by opcode {opcode_bits}")
+        # # type-b
+        # filler_bit=instruction-2*register-opcode_bits
+        # print(f"Number of filler bits is {filler_bit}")
+        # max_instruction=space/instruction
+        # printf(f"the maximum number of instructions this ISA can support is {len(str(int(max_instruction,2)))-1}")
+        # max_register=space/register
+        # printf(f"Maximum number of registers this ISA can support is:{len(str(int(max_register,2)))-1}")
+    elif(isaType==2):
+
+def ques_2():    
+    quesType=int(input("Type of System Enhancement..?"))
+    if(quesType==1):   
+        cpuBits=int(input("Bits of CPU:"))
+        changeTo=input("Change the type of CPU to(Bit,Byte,Nibble,word_add):")
+    else:
+        cpuBits=int(input("Bits of CPU:"))
+        addPins=int(input("Address pins of CPU:"))
+        memType=input("Type of addressable memeory(Bit/Byte/Nibble/word_add):")
         
-
-
-
-
-
-        cont=input("Continue?(0/1)")
-        if(cont=="0"):
-            break
