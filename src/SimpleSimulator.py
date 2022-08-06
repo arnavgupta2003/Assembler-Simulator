@@ -79,8 +79,6 @@ def ieee_to_decimal(ieee):
         after=''
     decimal=binn_val_after_decimal(after)+binn_val_before_decimal(before)
     return decimal
-
-
 def resetflag():
     flag='0'*16
     update_reg('111',flag)
