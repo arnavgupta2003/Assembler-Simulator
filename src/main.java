@@ -17,7 +17,6 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Main I/O file
 		
-		//var
 		
 		//Local I/O Code (Stdin)
 		Scanner sc = new Scanner(System.in);
