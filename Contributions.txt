@@ -1,0 +1,125 @@
+Contributions:
+
+
+
+Raghav Sakhuja
+
+Q1..
+-Handled Core logic and processing
+-Instruction processing and throwing exceptions
+-Raising Flags
+-Handled genError
+-Project Interpreter
+-ASM testing for Assembly
+
+-Made functions such as;
+	*finalBinary
+	*genError
+	*returnType
+	*returnOp
+	*returnReg
+Q2..
+-Handled Core logic and processing
+-Instruction processing and throwing exceptions
+-Raising Flags
+-Handled genError
+-Project Interpreter
+-SIM testing for various test cases
+
+-Made functions such as;
+	*Overflow Detection
+	*binn_val_after_decimal
+	*binn_val_before_decimal
+
+Q3..
+-Complete FLT addition to SIM
+	*float to IEEE conversion
+	*Issued extra functions
+	*Handled Overflow
+-Made functions such as;
+	*ieee_to_decimal
+	*bin_arithmetic
+	*Arithmetic Functions
+-Project Interpretation
+
+Q4..
+-Setting up libraries for plot generation
+-Handling Plotting functions
+-Refined Plots
+-Project Interpretation
+
+Q5..
+-Handled size returning functions 
+-Created Formulas for conversion
+-Improved Logic of Ques_1
+-Handled user exception inputs
+-Refined Project Interpretation
+
+
+Arnav Gupta
+
+Q1..
+-I/O
+-Operational Lists
+-Flag Symantics
+-Exception handling
+-input classification
+-ASM testing for hard Assembly
+-Demo Showcasing
+
+-Made functions such as;
+	*reservedWords
+	*checkFlag
+	*genLine
+	*main
+	*STDin
+	*STDout
+Q2..
+-I/O
+-Operational Lists
+-Flag Symantics
+-Exception handling
+-input classification
+-SIM testing for hard test cases
+-Demo Showcasing
+
+-Made functions such as;
+	*Arithmetic Functions
+	*STDin
+	*STDout
+	*Getter and Setter functions
+	*Decision Functions
+
+Q3..
+-Complete FLT addition to ASM
+	*float to IEEE conversion
+	*Issued extra functions
+	*Handled Overflow
+-Made functions such as;
+	*dec_to_ieee
+	*return_Flt_OP
+	*ieee_to_decimal
+Q4..
+-Setting up libraries for plot generation
+-Handling Plotting functions
+-Demo Showcasing
+Q5..
+-I/O
+-Handled Operational Lists
+-Improved logic of Ques_2 (a & b)
+-Beautification of terminal
+-Demo Showcasing
+-Refined Project Interpretation
+
+
+
+Atharv Srivastava
+
+Q1..
+Q2..
+Q3..
+Q4..
+Q5..
+-Project Interpretation
+-Handled logic of Ques_1
+-Handled logic of Ques_2(a & b)
