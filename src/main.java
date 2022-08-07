@@ -122,7 +122,7 @@ public class main {
 			
 			//Commit to lists
 			if(isVar) {
-				variables.put(in[1], program_counter+1);
+				variables.put(in[1], program_counter+variables.size()+1);
 			}else if(isLabel) {
 				Labels.put(in[0], program_counter);
 				instructions.add(genLine(in,1,in.length-1));

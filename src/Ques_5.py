@@ -58,7 +58,7 @@ def ques_1(memSpace,memType):
     print("2. Type B: <Q bit opcode> <R bits filler> <N bit register> <N bit register>\n\n")    
     insLength=int(input("Length of one inst. in bits:"))
     regLength=int(input("Length of one reg. in bits:"))
-    cpu=int(input("Enter the CPU size in bits:"))
+    cpu=int(input("Enter the number of bits of CPU:"))
     print()
     print()
     

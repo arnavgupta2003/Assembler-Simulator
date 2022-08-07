@@ -541,12 +541,13 @@ cycle=0
 x_axis_cycle=[]
 y_axis_mem=[]
 RegStack=["0000000000000000"]*8
-MemStack=["0000000000000000"]*256
+MemStack=["0000000000000000"]*257
 lines=[]
 
 i=0
 for line in stdin:
-    line=line[:-1]
+    if(line[-1]=='\n'):
+        line=line[:-1]
     if(len(line)!=16):
         pass
 
@@ -569,10 +570,17 @@ with open("out.txt",'w') as f:
         pc_val=bin(pc)[2:]
         pc_val=pc_val.zfill(8)
         operatorCall(MemStack[pc],pc)
-        print(pc_val,end=' ')
-        print(*RegStack)
-        f.write(pc_val+' ')
-        f.write(' '.join(RegStack)+'\n')
+        print(pc_val,end='')
+        f.write(pc_val)
+
+        for i in RegStack:
+            print(' '+i,end='',sep='')
+            f.write(' '+i)
+
+        print('\n',sep='',end='')
+        f.write('\n')
+
+        # f.write(str(pc)+" " + MemStack[pc]+'\n')
 
 
         if(halt==1):
@@ -580,7 +588,7 @@ with open("out.txt",'w') as f:
 
 
 
-    print('\n'.join(MemStack))
+    print('\n'.join(MemStack[0:-1]))
     f.write('\n'.join(MemStack))
 
 plt.scatter(x_axis_cycle,y_axis_mem,c='red')
