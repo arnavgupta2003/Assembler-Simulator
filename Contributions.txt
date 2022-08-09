@@ -116,8 +116,17 @@ Q5..
 Atharv Srivastava
 
 Q1..
+-Made functions such as;
+	*genError
+
 Q2..
+-Made functions such as;
+	*Logic Operation Functions (Getter and Setters)
+
 Q3..
+-Responsible for Decimal to IEEE conversion
+-Made functions such as;
+	*dec_to_ieee
 Q4..
 Q5..
 -Project Interpretation

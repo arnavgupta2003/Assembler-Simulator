@@ -570,14 +570,14 @@ with open("out.txt",'w') as f:
         pc_val=bin(pc)[2:]
         pc_val=pc_val.zfill(8)
         operatorCall(MemStack[pc],pc)
-        print(pc_val,end='')
+        #print(pc_val,end='')
         f.write(pc_val)
 
         for i in RegStack:
-            print(' '+i,end='',sep='')
+            #print(' '+i,end='',sep='')
             f.write(' '+i)
 
-        print('\n',sep='',end='')
+        #print('\n',sep='',end='')
         f.write('\n')
 
         # f.write(str(pc)+" " + MemStack[pc]+'\n')
